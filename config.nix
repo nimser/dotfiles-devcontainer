@@ -1,24 +1,21 @@
+{ pkgs ? import <nixpkgs> {} }:
+
 let
   systemType = builtins.getEnv "SYSTEM_TYPE";
-  # Create a new pkgs instance with unfree allowed
+  # Import the neovim-nightly-overlay
+  neovim-nightly-overlay = builtins.fetchTarball {
+    url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";
+  };
+  
+  # Create a custom pkgs with the overlay applied
   unfree-pkgs = import <nixpkgs> {
     config = {
       allowUnfree = true;
     };
+    overlays = [
+      (import neovim-nightly-overlay)
+    ];
   };
-
-  # Simple Neovim nightly from pre-built Github binaries
-  neovim-nightly = unfree-pkgs.stdenv.mkDerivation {
-    name = "neovim-nightly";
-    src = builtins.fetchTarball { # FIXME: impure, breaks reproductibility
-      url = "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz";
-    };
-    installPhase = ''
-      mkdir -p $out
-      cp -r ./* $out/
-    '';
-  };
-
   base = with unfree-pkgs; [
     tealdeer
     gnumake
@@ -31,7 +28,7 @@ let
     fd
     ripgrep
     luarocks
-    neovim-nightly
+    neovim
   ];
   server = with unfree-pkgs; [
     kubectl
@@ -46,7 +43,9 @@ let
     obsidian
     brave
   ];
-in {
+in
+{
+  # Or if you had a tools derivation like in your error message:
   packageOverrides = pkgs: {
     myPackages = pkgs.buildEnv {
       name = "nimser-tools";
