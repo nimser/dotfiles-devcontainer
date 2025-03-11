@@ -5,7 +5,6 @@
       paths = [
         # --- base
         fish
-        neovim
         nodejs_22
         fd
         ripgrep
