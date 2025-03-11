@@ -7,18 +7,6 @@ let
     };
   };
 
-  # Simple Neovim nightly from pre-built Github binaries
-  neovim-nightly = unfree-pkgs.stdenv.mkDerivation {
-    name = "neovim-nightly";
-    src = builtins.fetchTarball { # FIXME: impure, breaks reproductibility
-      url = "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz";
-    };
-    installPhase = ''
-      mkdir -p $out
-      cp -r ./* $out/
-    '';
-  };
-
   base = with unfree-pkgs; [
     tealdeer
     gnumake
@@ -31,7 +19,6 @@ let
     fd
     ripgrep
     luarocks
-    neovim-nightly
   ];
   server = with unfree-pkgs; [
     kubectl
