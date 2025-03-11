@@ -1,5 +1,6 @@
-
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> {
+  config.allowUnfree = true;  # Required for Brave/Discord
+} }:
 let
   systemType = builtins.getEnv "SYSTEM_TYPE";
 
