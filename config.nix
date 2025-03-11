@@ -1,16 +1,25 @@
-{ pkgs ? import <nixpkgs> {
-  config.allowUnfree = true;  # Required for Brave/Discord
-} }:
 let
   systemType = builtins.getEnv "SYSTEM_TYPE";
-
-  # remote pagkages 
-  github-neovim = builtins.fetchGit {
-    url = "https://github.com/neovim/neovim.git";
-    ref = "refs/tags/nightly";
+  # Create a new pkgs instance with unfree allowed
+  unfree-pkgs = import <nixpkgs> {
+    config = {
+      allowUnfree = true;
+    };
   };
 
-  base = with pkgs; [
+  # Simple Neovim nightly from pre-built Github binaries
+  neovim-nightly = unfree-pkgs.stdenv.mkDerivation {
+    name = "neovim-nightly";
+    src = builtins.fetchTarball { # FIXME: impure, breaks reproductibility
+      url = "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz";
+    };
+    installPhase = ''
+      mkdir -p $out
+      cp -r ./* $out/
+    '';
+  };
+
+  base = with unfree-pkgs; [
     tealdeer
     gnumake
     gcc
@@ -22,15 +31,15 @@ let
     fd
     ripgrep
     luarocks
-    github-neovim
+    neovim-nightly
   ];
-  server = with pkgs; [
+  server = with unfree-pkgs; [
     kubectl
     kubectx
     k9s
     fluxcd
   ];
-  desktop = with pkgs; [
+  desktop = with unfree-pkgs; [
     appimage-run
     lazygit
     discord
@@ -41,9 +50,7 @@ in {
   packageOverrides = pkgs: {
     myPackages = pkgs.buildEnv {
       name = "nimser-tools";
-      paths = base ++ (if systemType == "server" then server else desktop);
+      paths = base ++ (if systemType == "desktop" then desktop else server);
     };
   };
 }
-
-#git tree htop luarocks ripgrep fd-find
