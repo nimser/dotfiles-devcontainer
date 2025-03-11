@@ -9,9 +9,6 @@ mkdir -p "$XDG_CONFIG_HOME"/nixpkgs
 ln -sf "$PWD/nvim" "$XDG_CONFIG_HOME"/nvim
 ln -sf "$PWD/config.nix" "$XDG_CONFIG_HOME"/nixpkgs/config.nix
 
-# Install latest neovim nightly
-sh <(curl -L https://raw.githubusercontent.com/nimser/dotfiles/raw/master/scripts/.local/bin/neovim_install.sh)
-
 # Install nix if not available
 if ! command -v nix-env &>/dev/null; then
   echo "nix-env command not found. Attempting to install Nix..."
