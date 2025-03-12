@@ -9,7 +9,6 @@
         tealdeer
         gnumake
         gcc
-        netplan
         fish
         tree
         htop
@@ -42,7 +41,9 @@
     in {
       myPackages = pkgs.buildEnv {
         name = "nimser-tools";
-        paths = base ++ (if systemType == "desktop" then desktop else server);
+        paths = base
+          ++ (if systemType == "desktop" then desktop else [])
+          ++ (if systemType == "server" then server else []);
       };
     };
 }
