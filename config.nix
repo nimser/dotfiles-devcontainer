@@ -18,7 +18,6 @@
         luarocks
       ];
       server = with pkgs; [
-        kubectl
         kubectx
         k9s
         fluxcd
