@@ -16,6 +16,7 @@
         fd
         ripgrep
         luarocks
+        gh
       ];
       server = with pkgs; [
         kubectx
