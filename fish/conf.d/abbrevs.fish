@@ -51,6 +51,8 @@ abbr --add ghrc gh repo create
 # RipGrep
 abbr --add rg --set-cursor "rg --hidden --follow % --glob '!*{node_modules,dist,build}/**'"
 abbr --add rgf --set-cursor "rg --hidden --follow --files-with-matches % --glob '!*{node_modules,dist,build}/**'"
-# Shortcuts
+abbr --add k kubectl
+abbr --add kgp kubectl get pods
+# Local shortcuts
 abbr --add eabbr nvim -p ~/.config/fish/conf.d/abbrevs.fish
 
