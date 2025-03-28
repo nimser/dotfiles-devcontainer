@@ -53,6 +53,7 @@ abbr --add rg --set-cursor "rg --hidden --follow % --glob '!*{node_modules,dist,
 abbr --add rgf --set-cursor "rg --hidden --follow --files-with-matches % --glob '!*{node_modules,dist,build}/**'"
 abbr --add k kubectl
 abbr --add kgp kubectl get pods
+abbr --add kgs kubectl get services
 # Local shortcuts
 abbr --add eabbr nvim -p ~/.config/fish/conf.d/abbrevs.fish
 
