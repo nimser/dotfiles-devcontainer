@@ -91,11 +91,11 @@ for_window [instance="pavucontrol"] floating enable, resize set 900 900, move sc
 ## Application keybindings
 # kill focused window
 bindsym $mod+Mod1+q kill
-bindsym $mod+t exec alacritty -e distrobox enter Arch
-bindsym $mod+Return exec alacritty --config-file /home/owner/.config/alacritty/alacritty-host.yml
-bindsym $mod+i exec dmenu_run -nb black -sb tomato -l 10
-bindsym $mod+Mod1+l exec i3lock -c 00000
-bindsym Ctrl+$mod+BackSpace exec i3-msg exit"
+bindsym $mod+t exec --no-startup-ip alacritty -e distrobox enter Arch
+bindsym $mod+Return exec --no-startup-id alacritty --config-file /home/owner/.config/alacritty/alacritty-host.yml
+bindsym $mod+i exec --no-startup-id dmenu_run -nb black -sb tomato -l 10
+bindsym $mod+Mod1+l exec --no-startup-id i3lock -c 00000
+bindsym Ctrl+$mod+BackSpace exec --no-startup-id i3-msg exit"
 
 # Floating windows - findout the classname using  `xprop`
 for_window [class="Pavucontrol"] floating enable
