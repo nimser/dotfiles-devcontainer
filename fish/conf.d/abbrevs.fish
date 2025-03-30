@@ -54,6 +54,8 @@ abbr --add rgf --set-cursor "rg --hidden --follow --files-with-matches % --glob 
 abbr --add k kubectl
 abbr --add kgp kubectl get pods
 abbr --add kgs kubectl get services
+abbr --add kga --set-cursor "kubectl get all --namespace=%"
+abbr --add ksc --set-cursor "kubectl config set-context --current --namespace=%"
 # Local shortcuts
 abbr --add eabbr nvim -p ~/.config/fish/conf.d/abbrevs.fish
 
