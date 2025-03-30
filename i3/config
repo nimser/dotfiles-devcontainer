@@ -71,18 +71,17 @@ assign [class="chromium"] $workspace1
 assign [class="Alacritty"] $workspace3
 assign [class="obsidian"] $workspace10
 # Make some apps launch when i3 first starts
-exec --no-startup-id nm-applet
-exec --no-startup-id fcitx5 -d
-#exec --no-startup-id ibus-daemon --xim -d -r
-exec --no-startup-id compton --config ~/.config/compton.conf -b
-#-exec --no-startup-id gromit-mpx
-exec --no-startup-id /usr/bin/blueman-applet
-exec xrandr --output $secondaryMonitor --auto --above $firstMonitor 
-#-exec --no-startup-id /usr/bin/goldendict
-exec --no-startup-id xmodmap -e 'pointer = 1 2 3 4 5 6 7 8 9'
+exec_always --no-startup-id picom -b
+exec_always --no-startup-id xrandr --output $secondaryMonitor --auto --above $firstMonitor 
 # info: find device name with `xinput list`
-exec --no-startup-ip xinput set-button-map "SUZA 2.4G Wireless Mouse" 1 2 3 4 5 6 7 2 2
-exec keepassxc
+exec_always --no-startup-id xinput set-button-map "SUZA 2.4G Wireless Mouse" 1 2 3 4 5 6 7 2 2
+exec --no-startup-id nm-applet
+exec --no-startup-id /usr/bin/blueman-applet
+exec --no-startup-id fcitx5 -d
+exec --no-startup-id keepassxc
+#exec --no-startup-id ibus-daemon --xim -d -r
+#exec --no-startup-id gromit-mpx
+#exec --no-startup-id /usr/bin/goldendict
 bindsym $mod+Mod1+p [instance="keepassxc"] scratchpad show, move position center
 for_window [instance="keepassxc"] floating enable, resize set 900 900, move scratchpad, border pixel 5
 bindsym $mod+Mod1+s [instance="pavucontrol"] scratchpad show, move position center
@@ -96,7 +95,7 @@ bindsym $mod+t exec alacritty -e distrobox enter Arch
 bindsym $mod+Return exec alacritty --config-file /home/owner/.config/alacritty/alacritty-host.yml
 bindsym $mod+i exec dmenu_run -nb black -sb tomato -l 10
 bindsym $mod+Mod1+l exec i3lock -c 00000
-bindsym Ctrl+$mod+Backspace exec i3-msg exit"
+bindsym Ctrl+$mod+BackSpace exec i3-msg exit"
 
 # Floating windows - findout the classname using  `xprop`
 for_window [class="Pavucontrol"] floating enable
@@ -113,7 +112,6 @@ bindsym XF86AudioMute exec --no-startup-id amixer -D pulse sset Master toggle # 
 bindsym XF86MonBrightnessUp exec "xbacklight + 5"
 bindsym XF86MonBrightnessDown exec "xbacklight - 5"
 
-
 ## i3 keybindings
 # change focus
 bindsym $mod+Left focus left
@@ -126,10 +124,10 @@ bindsym $mod+Mod1+Down move down
 bindsym $mod+Mod1+Up move up
 bindsym $mod+Mod1+Right move right
 # move focused window
-bindsym $mod+mod1+Shift+left move workspace to output left
-bindsym $mod+mod1+Shift+down move workspace to output down
-bindsym $mod+mod1+Shift+up move workspace to output up
-bindsym $mod+mod1+Shift+right move workspace to output right
+bindsym $mod+mod1+Shift+Left move workspace to output left
+bindsym $mod+mod1+Shift+Down move workspace to output down
+bindsym $mod+mod1+Shift+Up move workspace to output up
+bindsym $mod+mod1+Shift+Right move workspace to output right
 # split in horizontal orientation
 bindsym $mod+h split h
 # split in vertical orientation
