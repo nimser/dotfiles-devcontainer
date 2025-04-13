@@ -1,6 +1,8 @@
 # Override reboot
 abbr --add reboot sudo shutdown -r now
 abbr --add powerdown sudo shutdown now
+# Quality of Life
+abbr --add p pass
 # Development
 abbr --add dob docker build
 abbr --add dor docker run -dp 8080:80
