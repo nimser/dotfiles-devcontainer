@@ -18,6 +18,8 @@ ln -sf "$PWD/fonts" "$HOME"/.local/share/fonts
 
 # Install latest neovim nightly
 sh <(curl -L https://raw.githubusercontent.com/nimser/dotfiles/master/scripts/.local/bin/neovim_install.sh)
+# Install/update pkgx
+curl -fsS https://pkgx.sh | sh
 
 # Install nix if not available
 if ! command -v nix-env &>/dev/null; then
