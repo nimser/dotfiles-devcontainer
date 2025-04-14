@@ -15,6 +15,7 @@ ln -sf "$PWD/fd" "$XDG_CONFIG_HOME"/fd
 ln -sf "$PWD/config.nix" "$XDG_CONFIG_HOME"/nixpkgs/config.nix
 ln -sf "$PWD/fonts" "$HOME"/.local/share/fonts
 
+ln -sf "$PWD/rclone/rclone" "$HOME"/.local/bin/rclone
 
 # Install latest neovim nightly
 sh <(curl -L https://raw.githubusercontent.com/nimser/dotfiles/master/scripts/.local/bin/neovim_install.sh)
