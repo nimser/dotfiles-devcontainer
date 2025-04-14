@@ -1,5 +1,5 @@
 #!/usr/bin/env -S pkgx +fish -- fish
-set -x remote SWISSBACKUP
+set -x default_remote swissbackup
 set -x rclone_path /usr/bin/rclone
 
 function get_credentials
@@ -12,15 +12,12 @@ function get_credentials
     if test $i -eq 5
       set -gx RCLONE_CONFIG_(string upper $credentials_id)_(echo $credentials_keys[$i]) ($rclone_path obscure $credentials_parts[$i])
     else
-      set -gx RCLONE_CONFIG_(echo $remote)_(echo $credentials_keys[$i]) $credentials_parts[$i]
+      set -gx RCLONE_CONFIG_(string upper $default_remote)_(echo $credentials_keys[$i]) $credentials_parts[$i]
     end
   end
 end
-
-if string match -r '.*swissbackup:.*' -- $argv
-  get_credentials swissbackup
-end
-if string match -q -- '*sbcrypt1:*' -- $argv
-  get_credentials sbcrypt1
+for match in (string match -r '[^:]+:' -- $argv)
+    set -l remote (string replace -r ':' '' $match)
+    get_credentials $remote
 end
 $rclone_path $argv
