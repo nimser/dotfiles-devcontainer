@@ -1,0 +1,26 @@
+#!/usr/bin/env -S pkgx +fish -- fish
+set -x remote SWISSBACKUP
+set -x rclone_path /usr/bin/rclone
+
+function get_credentials
+  set -f credentials_id $argv
+  set -f pass_selector (echo $credentials_id)_credentials
+  set -f credentials_entry (string split \n (pass rclone/$pass_selector))[1]
+  set -f credentials_parts (string split '|' $credentials_entry)
+  set -f credentials_keys USER KEY AUTH TENANT PASSWORD
+  for i in (seq (count $credentials_parts))
+    if test $i -eq 5
+      set -gx RCLONE_CONFIG_(string upper $credentials_id)_(echo $credentials_keys[$i]) ($rclone_path obscure $credentials_parts[$i])
+    else
+      set -gx RCLONE_CONFIG_(echo $remote)_(echo $credentials_keys[$i]) $credentials_parts[$i]
+    end
+  end
+end
+
+if string match -r '.*swissbackup:.*' -- $argv
+  get_credentials swissbackup
+end
+if string match -q -- '*sbcrypt1:*' -- $argv
+  get_credentials sbcrypt1
+end
+$rclone_path $argv
