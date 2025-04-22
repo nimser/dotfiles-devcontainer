@@ -2,8 +2,8 @@
   pager = nvim -R
   editor = nvim
   excludesFile = .gitignore.local
-#[commit]
-#  gpgsign = true
+[commit]
+  gpgsign = true
 [pull]
   ff = only
 [push]
