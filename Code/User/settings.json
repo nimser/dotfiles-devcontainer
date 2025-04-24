@@ -58,6 +58,5 @@
   "diffEditor.ignoreTrimWhitespace": true,
   "gitlens.hovers.currentLine.over": "line",
   "gitlens.currentLine.enabled": false,
-  "gitlens.codeLens.enabled": false,
-  "workbench.activityBar.location": "hidden"
+  "gitlens.codeLens.enabled": false
 }
