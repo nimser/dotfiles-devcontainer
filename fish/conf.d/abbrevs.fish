@@ -4,10 +4,6 @@ abbr --add powerdown sudo shutdown now
 # Quality of Life
 abbr --add p pass
 # Development
-abbr --add dob docker build
-abbr --add dor docker run -dp 8080:80
-abbr --add dop docker ps
-abbr --add dok docker kill
 abbr --add pn pnpm
 abbr --add pni pnpm install
 abbr --add pna pnpm add
@@ -23,6 +19,20 @@ abbr --add pcr --set-cursor "pnpm create vite % --template react"
 abbr --add pcv --set-cursor "pnpm create vite %"
 abbr --add vim nvim -p
 abbr --add v nvim -p
+# Docker
+abbr --add d docker
+abbr --add di docker images
+abbr --add dl docker images
+abbr --add dps docker ps
+abbr --add db docker build
+abbr --add dr docker run -dp 8080:80
+abbr --add drm docker rm
+abbr --add dk docker kill
+# Devpod
+abbr --add dp devpod
+abbr --add dpu --set-cursor "devpod up .% --ide none --recreate"
+abbr --add dpd devpod delete
+
 # Distrobox
 abbr --add dbxex --set-cursor "distrobox-export --bin /usr/sbin/% --export-path ~/.local/distrobox/bin"
 # Git
