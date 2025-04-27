@@ -17,7 +17,7 @@ fi
 export XDG_CONFIG_HOME="$HOME"/.config
 mkdir -p "$XDG_CONFIG_HOME"
 mkdir -p "$HOME"/.local/share
-
+mkdir -p "$HOME"/.local/bin
 # Create symlinks
 ln -sf "$PWD/nvim" "$XDG_CONFIG_HOME"/nvim
 ln -sf "$PWD/fish" "$XDG_CONFIG_HOME"/fish
@@ -26,4 +26,3 @@ ln -sf "$PWD/ripgrep" "$XDG_CONFIG_HOME"/ripgrep
 ln -sf "$PWD/fd" "$XDG_CONFIG_HOME"/fd
 ln -sf "$PWD/fonts" "$HOME"/.local/share/fonts
 ln -sf "$PWD/rclone/rclone" "$HOME"/.local/bin/rclone
-exit 0
