@@ -14,5 +14,4 @@ psd/**
 i3status/**
 chromium-flags.conf
 README.md
-config.nix
 setup
