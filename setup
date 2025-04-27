@@ -7,6 +7,11 @@ if ! command -v pkgx > /dev/null; then
   curl -fsS https://pkgx.sh | sh
 fi
 
+if ! command -v mise > /dev/null; then
+  pkgm install mise
+fi
+
+
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
   sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:nimser/private-dotfiles-devcontainer.git
