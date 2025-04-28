@@ -15,4 +15,7 @@ if status is-interactive
   if test -d ~/.rd/bin
     set --export --prepend PATH "~/.rd/bin"
   end
+  if test -e ~/.local/bin/mise
+    mise activate fish | source
+  end
 end
