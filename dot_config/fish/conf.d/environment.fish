@@ -6,5 +6,6 @@ set -gx EDITOR "nvim"
 set -gx DIFFPROG "nvim -d"
 set -gx BROWSER "brave-browser"
 # remember: an awesome feature of `nvim +Man!` is `gO` (gee-Oh) to open an browsable index of the manpage in the quickfix list
-set -gx PAGER "nvim +Man!"
+# set -gx PAGER "nvim +Man!"
+set -gx PAGER "less"
 set -gx LANG "en_US.UTF-8"
