@@ -6,6 +6,8 @@ set -euo pipefail
 if ! command -v pkgx > /dev/null; then
   curl -fsS https://pkgx.sh | sh
 fi
+# Use pkgm for userland packages not available in Mise
+pkgm install git-crypt
 
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
