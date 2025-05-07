@@ -1,3 +1,0 @@
-Add here any fonts, like Hack Nerd Fonts, font awesome etc...
-See https://github.com/ryanoasis/nerd-fonts for patched nerd fonts
-
