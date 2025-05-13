@@ -43,10 +43,11 @@ map("n", "<c-w>t", ":tabe<cr>")
 map("n", "gb", "gT")
 map("n", "gw", "gt")
 -- favorite files shortcuts
-map("n", "<localleader>ei", ":tabe ~/.config/i3/config<cr>", { desc = "Edit i3 config" })
+map("n", "<localleader>ei", ":tabe ~/.local/share/chezmoi/private_dot_config/i3/config<cr>", { desc = "Edit i3 config" })
 map("n", "<localleader>em", ":tabe ~/Sync/Sys-admin/vim-memo.md<cr>", { desc = "Edit vim memo" })
 map("n", "<localleader>ew", ":tabe ~/Sync/Freelance/workflow-improvement.md<cr>", { desc = "Edit workflow improvements" })
-map("n", "<localleader>ek", ":tabe ~/qmk_firmware/keyboards/centromere/keymaps/nimser/keymap.c<cr>", { desc = "Edit keyboard keymap file" })
+map("n", "<localleader>ek", ":tabe ~/qmk_firmware/keyboards/centromere/keymaps/nimser/keymap.c<cr>",
+  { desc = "Edit keyboard keymap file" })
 -- print/copy current file path
 map("n", "<localleader>p", function() print(vim.fn.expand("%:p")) end, { desc = "Print file path" })
 map("n", "<localleader>yp", function() vim.fn.setreg("+", vim.fn.expand("%:p")) end, { desc = "Copy file path" })
