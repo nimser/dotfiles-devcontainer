@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+# packages hash: {{ include "private_dot_config/mise/config.toml" | sha256sum }}
+
+set -euo pipefail
+
+mise_cmd=$(which mise)
+if command -v $mise_cmd > /dev/null; then
+  $mise_cmd trust && $mise_cmd install
+fi
