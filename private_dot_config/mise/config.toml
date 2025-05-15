@@ -1,0 +1,10 @@
+[tools]
+chezmoi = "latest"
+neovim = "latest"
+bat = "latest"
+"aqua:tealdeer-rs/tealdeer" = "latest"
+make = "latest"
+"aqua:sharkdp/fd" = "latest"
+"aqua:BurntSushi/ripgrep" = "latest"
+"aqua:cli/cli" = "latest"
+"aqua:tree-sitter/tree-sitter" = "latest"

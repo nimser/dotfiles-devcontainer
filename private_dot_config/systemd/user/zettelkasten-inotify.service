@@ -1,0 +1,15 @@
+[Unit]
+Description=Auto Git Commit and Push Service for my Zettelkasten
+After=graphical-session.target gpg-agent.socket
+
+[Service]
+
+ExecStart="/home/owner/Sync/00 Zettelkasten/ZZ_Resources/zettelkasten-inotify"
+Restart=always
+RestartSec=5s
+# Logs to user's systemd journal (view with journalctl --user -u zettelkasten-inotify.service)
+StandardOutput=journal
+
+[Install]
+WantedBy=graphical-session.target
+# Or: WantedBy=default.target
