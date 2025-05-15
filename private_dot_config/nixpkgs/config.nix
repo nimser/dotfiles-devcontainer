@@ -17,18 +17,10 @@
         fluxcd
       ];
       desktop = with pkgs; [
-        fcitx5
-        fcitx5-gtk
-        fcitx5-rime
-        fcitx5-configtool
-        fcitx5-material-color
-        fcitx5-chinese-addons
         sqlite
         tectonic
         mermaid-cli
         imagemagick
-        discord
-        obsidian
       ];
     in {
       myPackages = pkgs.buildEnv {
