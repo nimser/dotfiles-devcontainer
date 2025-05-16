@@ -13,7 +13,7 @@ if status is-interactive
   end
 
   if test -d ~/.rd/bin
-    set --export --prepend PATH "~/.rd/bin"
+    set -gx --prepend fish_user_paths "$HOME/.rd/bin"
   end
   if test -e ~/.local/bin/mise
     mise activate fish | source
