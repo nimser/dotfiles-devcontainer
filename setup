@@ -9,7 +9,7 @@ fi
 
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
-  sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:nimser/private-dotfiles-devcontainer.git
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin init --apply git@github.com:nimser/private-dotfiles-devcontainer.git
 fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
