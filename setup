@@ -26,10 +26,17 @@ if ! command -v nix-env &>/dev/null; then
   sh <(curl -L https://nixos.org/nix/install) --daemon --yes
   source /etc/profile.d/nix.sh
 fi
-# Set system type if not provided via cli
-export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
-# Install all packages defined in config.nix
-nix-env -iA nixpkgs.myPackages --impure
+
+if [ -f $HOME/.config/nixpkgs/config.nix ]; then
+  # Set system type if not provided via cli
+  export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
+  # Install all packages defined in config.nix
+  nix-env -iA nixpkgs.myPackages --impure
+else
+  echo "ERROR: Nix configuration file not found"
+  echo "Ensure chezmoi has run and deployed it correctly."
+  exit 1
+fi
 
 echo "Finished setting up dotfiles"
 exit 0
