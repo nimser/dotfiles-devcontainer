@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+# If $HOME/.local/bin not in path, add it
+if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  PATH="${PATH:+"$PATH:"}$HOME/.local/bin"
+fi
+
 # Install pkgx for sheebang deps (https://github.com/pkgxdev/pkgx?tab=readme-ov-file#scripting)
 if ! command -v pkgx > /dev/null; then
   curl -fsS https://pkgx.sh | sh
