@@ -2,9 +2,12 @@
 
 set -euo pipefail
 
+LOCAL_BIN="$HOME/.local/bin"
+mkdir -p $LOCAL_BIN
+
 # If $HOME/.local/bin not in path, add it
-if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-  PATH="${PATH:+"$PATH:"}$HOME/.local/bin"
+if [ -d "$LOCAL_BIN" ] && [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
+  PATH="${PATH:+"$PATH:"}$LOCAL_BIN"
 fi
 
 # Install pkgx for sheebang deps (https://github.com/pkgxdev/pkgx?tab=readme-ov-file#scripting)
@@ -14,7 +17,7 @@ fi
 
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
-  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin init --apply git@github.com:nimser/private-dotfiles-devcontainer.git
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git
 fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
