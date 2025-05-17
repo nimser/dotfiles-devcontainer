@@ -1,2 +1,3 @@
 {{- /* chezmoi:modify-template */ -}}
-{{ fromJson .chezmoi.stdin | setValueAtPath "SKIP_HOST_UPDATE" true | toPrettyJson }}
+{{- $content := default "{}" .chezmoi.stdin -}}
+{{- $content | fromJson | setValueAtPath "SKIP_HOST_UPDATE" true | toPrettyJson -}}
