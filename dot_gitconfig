@@ -3,7 +3,7 @@
   editor = nvim
   excludesFile = .gitignore.local
 [commit]
-  # Note: before disabling, consider `--no-pgp-sign` where needed
+  # Note: before disabling, consider `--no-gpg-sign` where needed
   # example: git rebase --interactive --no-gpg-sign && git commit --amend
   gpgsign = true
 [pull]
