@@ -15,7 +15,10 @@ if status is-interactive
   if test -d ~/.rd/bin
     set -gx --prepend fish_user_paths "$HOME/.rd/bin"
   end
-  if test -e ~/.local/bin/mise
+  if type -q mise
     mise activate fish | source
+  end
+  if type -q direnv
+    direnv hook fish | source
   end
 end
