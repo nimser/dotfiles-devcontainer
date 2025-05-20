@@ -17,6 +17,7 @@ if ! command -v chezmoi > /dev/null; then
 fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
+# Note: use nix feature instead for devcontainers
 if ! command -v nix-env &>/dev/null; then
   echo "nix-env command not found. Attempting to install Nix..."
   sh <(curl -L https://nixos.org/nix/install) --daemon --yes
