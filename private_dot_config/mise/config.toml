@@ -9,6 +9,6 @@ make = "latest"
 "aqua:cli/cli" = "latest"
 "aqua:tree-sitter/tree-sitter" = "latest"
 "aqua:k9s" = "latest"
-"aqua:fish-shell/fish-shell" = "latest"
+"aqua:fish-shell/fish-shell" = { version = "latest", postinstall = "echo 'yes' | fish --install;echo 'Fish data files installed'" }
 "ubi:pkgxdev/pkgx" = "latest"
 "ubi:pkgxdev/pkgm" = "latest"
