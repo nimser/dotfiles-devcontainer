@@ -3,6 +3,9 @@
 .gnupg/gpg.conf
 .ssh/config
 {{- end }}
+{{- if (env "DEVPOD" | ne "true") }}
+.gitconfig_devpod_credentials
+{{- end }}
 _system/**
 README.md
 setup
