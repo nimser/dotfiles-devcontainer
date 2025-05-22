@@ -4,5 +4,6 @@
 .ssh/config
 {{- end }}
 _system/**
+_utils/**
 README.md
 setup
