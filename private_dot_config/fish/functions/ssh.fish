@@ -11,7 +11,11 @@ function ssh --description "Wrapper for ssh: changes bg color and uses gpg agent
       set color_restore_needed true
     end
   end
-  gpg-connect-agent updatestartuptty /bye;command ssh $argv
+  # This gpg-connect-agent wrapper ensures any terminal-based pinentry appears in the curently active terminal window
+  if test $DEVPOD != "true"
+    gpg-connect-agent updatestartuptty /bye
+  end
+  command ssh $argv
   set -l ssh_exit_status $status
   if $color_restore_needed
     alacritty msg config "colors.primary.background='$default_bg'"
