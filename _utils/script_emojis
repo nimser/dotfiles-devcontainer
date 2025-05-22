@@ -1,0 +1,13 @@
+# Principe
+
+Make sure using rather unique icons in own scripts to differenciate own message from other output.
+
+# Icons
+
+echo/info: 🥁 (drum) or 🔔 (bell) or 🤖(robot)
+in progress: 🧠(brain)
+error: 💥 (collision) or 👹(ogre) or 💩 (pile of poo) or 🧨(firecracker)
+finished: 🎯(bullseye) 
+
+Find more at https://www.unicode.org/emoji/charts/full-emoji-list.html
+
