@@ -43,5 +43,7 @@
   defaultBranch = main
 [pager]
   branch = false
-[includeIf "env:DEVPOD:true"]
-  path = ~/.gitconfig_devpod_credentials
+{{- if (env "DEVPOD" | eq "true") }}
+[credential]
+  helper = !'/usr/local/bin/devpod' agent git-credentials --port 12049
+{{- end }}
