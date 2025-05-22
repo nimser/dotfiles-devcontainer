@@ -43,3 +43,5 @@
   defaultBranch = main
 [pager]
   branch = false
+[includeIf "env:DEVPOD:true"]
+  path = ~/.gitconfig_devpod_credentials
