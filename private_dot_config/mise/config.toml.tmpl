@@ -4,6 +4,9 @@ kubectl = "latest"
 "aqua:k9s" = "latest"
 "aqua:fluxcd/flux2" = "latest"
 {{- end}}
+{{- if eq .chezmoi.hostname "tpad"}}
+"ubi:yt-dlp/yt-dlp" = "latest"
+{{- end}}
 chezmoi = "latest"
 neovim = "latest"
 bat = "latest"
