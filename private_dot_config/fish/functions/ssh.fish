@@ -12,7 +12,7 @@ function ssh --description "Wrapper for ssh: changes bg color and uses gpg agent
     end
   end
   # This gpg-connect-agent wrapper ensures any terminal-based pinentry appears in the curently active terminal window
-  if test $DEVPOD != "true"
+  if test "$DEVPOD" != "true"
     gpg-connect-agent updatestartuptty /bye
   end
   command ssh $argv

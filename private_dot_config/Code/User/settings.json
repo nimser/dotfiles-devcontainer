@@ -55,8 +55,9 @@
   "workbench.editor.navigationScope": "editorGroup",
   "workbench.editor.openPositioning": "last",
   "workbench.editor.closeEmptyGroups": false,
-  "diffEditor.ignoreTrimWhitespace": true,
+  "diffEditor.ignoreTrimWhitespace": false,
   "gitlens.hovers.currentLine.over": "line",
   "gitlens.currentLine.enabled": false,
-  "gitlens.codeLens.enabled": false
+  "gitlens.codeLens.enabled": false,
+  "diffEditor.renderSideBySide": false
 }
