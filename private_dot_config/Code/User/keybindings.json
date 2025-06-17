@@ -206,5 +206,9 @@
     "key": "ctrl+o",
     "command": "-workbench.action.files.openLocalFile",
     "when": "remoteFileDialogVisible"
+  },
+  {
+    "key": "ctrl+w ctrl+f",
+    "command": "workbench.action.toggleMaximizedPanel"
   }
 ]
