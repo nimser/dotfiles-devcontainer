@@ -2,6 +2,7 @@
 .gnupg/gpg-agent.conf
 .gnupg/gpg.conf
 .ssh/config
+.config/nvim/lazyvim.json
 {{- end }}
 _system/**
 _utils/**
