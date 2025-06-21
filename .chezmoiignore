@@ -3,6 +3,7 @@
 .gnupg/gpg.conf
 .ssh/config
 {{- end }}
+.config/nvim/lazyvim.json
 _system/**
 _utils/**
 README.md
