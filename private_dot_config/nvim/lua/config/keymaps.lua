@@ -44,7 +44,7 @@ map("n", "gb", "gT")
 map("n", "gw", "gt")
 -- favorite files shortcuts
 map("n", "<localleader>ei", ":tabe ~/.local/share/chezmoi/private_dot_config/i3/config<cr>", { desc = "Edit i3 config" })
-map("n", "<localleader>em", ":tabe ~/Sync/Sys-admin/vim-memo.md<cr>", { desc = "Edit vim memo" })
+map("n", "<localleader>em", ":tabe ~/Sync/00 Zettelkasten/Zettelkasten/vim-memo.md<cr>", { desc = "Edit vim memo" })
 map("n", "<localleader>ew", ":tabe ~/Sync/Freelance/workflow-improvement.md<cr>", { desc = "Edit workflow improvements" })
 map("n", "<localleader>ek", ":tabe ~/qmk_firmware/keyboards/centromere/keymaps/nimser/keymap.c<cr>",
   { desc = "Edit keyboard keymap file" })
