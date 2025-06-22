@@ -75,8 +75,8 @@ map("n", "gb", "gT")
 map("n", "gw", "gt")
 -- favorite files shortcuts
 map("n", "<localleader>ei", ":tabe ~/.local/share/chezmoi/private_dot_config/i3/config<cr>", { desc = "Edit i3 config" })
-map("n", "<localleader>en", function() edit_day_journal() end, { desc = "Edit daily note" })
-map("n", "<localleader>et", function() edit_day_journal({ next_day = true }) end, { desc = "Edit [t]mro's note" })
+map("n", "<localleader>et", function() edit_day_journal() end, { desc = "Edit today's daily note" })
+map("n", "<localleader>en", function() edit_day_journal({ next_day = true }) end, { desc = "Edit next day's note" })
 map("n", "<localleader>em", function() edit_vim_memo() end, { desc = "Edit vim memo" })
 map("n", "<localleader>ew", ":tabe ~/Sync/Freelance/workflow-improvement.md<cr>", { desc = "Edit workflow improvements" })
 map("n", "<localleader>ek", ":tabe ~/qmk_firmware/keyboards/centromere/keymaps/nimser/keymap.c<cr>",
