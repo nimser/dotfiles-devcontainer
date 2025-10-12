@@ -12,9 +12,7 @@
         luarocks
       ];
       server = with pkgs; [
-        kubectx
-        k9s
-        fluxcd
+        # empty for now, everything's handled via mise
       ];
       desktop = with pkgs; [
         sqlite
