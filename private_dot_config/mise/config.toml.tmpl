@@ -1,6 +1,7 @@
 [tools]
 {{- if ne .chezmoi.hostname "tpad"}}
 kubectl = "latest"
+kubectx = "latest"
 "aqua:k9s" = "latest"
 "aqua:fluxcd/flux2" = "latest"
 {{- end}}
@@ -22,5 +23,8 @@ bat = "latest"
 direnv = "latest"
 node = "latest"
 lazygit = "latest"
+fzf = "latest"
+age = "latest"
+sops = "latest"
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
