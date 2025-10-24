@@ -3,6 +3,11 @@
 .gnupg/gpg.conf
 .ssh/config
 .config/nvim/lazyvim.json
+.Xmodmap
+.xsessionrc
+.Xresources
+.xprofile
+.XCompose
 {{- end }}
 .config/nvim/lazyvim.json
 _system/**
