@@ -13,7 +13,7 @@
         luarocks
       ];
       server = with pkgs; [
-        # empty for now, everything's handled via mise
+        wakeonlan
       ];
       desktop = with pkgs; [
         sqlite
