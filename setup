@@ -3,6 +3,7 @@
 set -euo pipefail
 
 LOCAL_BIN="$HOME/.local/bin"
+GPGID=0x03BC4AD253B82986
 mkdir -p $LOCAL_BIN
 
 # If $HOME/.local/bin not in path, add it
@@ -10,10 +11,13 @@ if [ -d "$LOCAL_BIN" ] && [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
   PATH="${PATH:+"$PATH:"}$LOCAL_BIN"
 fi
 
+# Setup gpg
+gpg --receive-keys $GPGID
+
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
-  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted
-  echo "🥁 Only non-encrypted files where applied. Please run `chezmoi apply --include=encrypted` if needed."
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git
+  echo "🥁Chezmoi initialized. If you see errors above, make sure GPG is setup properly."
 fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
