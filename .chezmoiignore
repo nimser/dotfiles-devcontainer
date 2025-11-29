@@ -12,5 +12,6 @@
 .config/nvim/lazyvim.json
 _system/**
 _utils/**
+.devcontainer/**
 README.md
 setup
