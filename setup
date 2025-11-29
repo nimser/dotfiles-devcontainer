@@ -16,8 +16,8 @@ gpg --receive-keys $GPGID
 
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
-  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git
-  echo "🥁Chezmoi initialized. If you see errors above, make sure GPG is setup properly."
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted
+  echo "🥁 Only non-encrypted files where applied. Please run `chezmoi apply --include=encrypted` if needed."
 fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
