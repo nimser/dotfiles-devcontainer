@@ -13,7 +13,5 @@
 _system/**
 _utils/**
 .devcontainer/**
-.gemini/**
-.envrc
 README.md
 setup
