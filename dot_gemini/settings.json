@@ -1,0 +1,41 @@
+{
+  "general": {
+    "previewFeatures": true
+  },
+  "advanced": {
+    "excludedEnvVars": [
+      "DEBUG",
+      "DEBUG_MODE",
+      "NODE_ENV"
+    ]
+  },
+  "ui": {
+    "hideTips": false,
+    "hideBanner": false,
+    "showMemoryUsage": true,
+    "theme": "GitHub",
+    "footer": {
+      "hideSandboxStatus": true,
+      "hideContextPercentage": false
+    }
+  },
+  "context": {
+    "includeDirectories": [
+      ".."
+    ],
+    "loadFromIncludeDirectories": true
+  },
+  "model": {
+    "maxSessionTurns": 200,
+    "summarizeToolOutput": {
+      "run_shell_command": {
+        "tokenBudget": 500
+      }
+    }
+  },
+  "mcpServers": {},
+  "telemetry": {},
+  "privacy": {
+    "usageStatisticsEnabled": false
+  }
+}
