@@ -1,17 +1,36 @@
 #!/bin/sh
 
+export PNPM_HOME="${HOME}/.local/share/pnpm"
+export MISE_DATA_DIR="${HOME}/.local/share/mise"
+
+
+if [ -d "${HOME}/.local/bin" ];then
+  PATH="${PATH}:${HOME}/.local/bin"
+fi
+
+if [ -d $PNPM_HOME ]; then
+  PATH="${PATH}:${PNPM_HOME}"
+fi
+
+if [ -d "${HOME}/.iximiuz/labctl/bin" ]; then
+  PATH="${PATH}:${HOME}/.iximiuz/labctl/bin"
+fi
+
+if [ -d "$MISE_DATA_DIR/shims" ]; then
+  PATH="$MISE_DATA_DIR/shims:$PATH"
+fi
+
+export PATH
+
+if [ -t 0 ]; then
+  if command -v fish > /dev/null 2>&1; then
+    exec fish
+  fi
+fi
+
 # if running bash, source .bashrc
 if [ -n "$BASH_VERSION" ]; then
-    if [ -f "$HOME/.bashrc" ]; then
-        . "$HOME/.bashrc"
-    fi
-fi
-
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
+  if [ -f "$HOME/.bashrc" ]; then
+    . "$HOME/.bashrc"
+  fi
 fi

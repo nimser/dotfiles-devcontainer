@@ -1,6 +1,6 @@
 if status is-interactive
 
-  # Note: use ~/.xsessionrc instead for env variables that need to be globally available outside shell 
+  # Note: use ~/.profile and ~/.xsessionrc instead for env variables that need to be globally available outside shell 
 
   # First login: decrypt encrypted chezmoi files
   if type -q chezmoi
