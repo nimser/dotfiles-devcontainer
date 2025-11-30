@@ -12,7 +12,8 @@
     "GIT_COMMITTER_NAME": "${localEnv:GIT_COMMITTER_NAME}",
     "GIT_AUTHOR_NAME": "${localEnv:GIT_AUTHOR_NAME}",
     "GIT_AUTHOR_EMAIL": "${localEnv:GIT_AUTHOR_EMAIL}",
-    "GOOGLE_API_KEY": "${localEnv:GOOGLE_API_KEY}"
+    "GOOGLE_API_KEY": "${localEnv:GOOGLE_API_KEY}",
+    "GEMINI_API_KEY": "${localEnv:GOOGLE_API_KEY}"
   },
   "customizations": {
     "vscode": {
