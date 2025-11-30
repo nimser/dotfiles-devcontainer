@@ -37,5 +37,10 @@
   "telemetry": {},
   "privacy": {
     "usageStatisticsEnabled": false
+  },
+  "security": {
+    "auth": {
+      "selectedType": "gemini-api-key"
+    }
   }
 }
