@@ -8,9 +8,7 @@ if [ -d "${HOME}/.local/bin" ];then
   PATH="${PATH}:${HOME}/.local/bin"
 fi
 
-if [ -d $PNPM_HOME ]; then
-  PATH="${PATH}:${PNPM_HOME}"
-fi
+PATH="${PATH}:${PNPM_HOME}"
 
 if [ -d "${HOME}/.iximiuz/labctl/bin" ]; then
   PATH="${PATH}:${HOME}/.iximiuz/labctl/bin"
