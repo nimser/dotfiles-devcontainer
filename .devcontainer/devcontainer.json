@@ -7,6 +7,7 @@
     "ghcr.io/devcontainers/features/nix:1": {}
   },
   "remoteEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}",
     "GITHUB_TOKEN": "${localEnv:GITHUB_PAT_PUBLIC_REPO}",
     "GIT_COMMITTER_EMAIL": "${localEnv:GIT_COMMITTER_EMAIL}",
     "GIT_COMMITTER_NAME": "${localEnv:GIT_COMMITTER_NAME}",
@@ -15,6 +16,16 @@
     "GOOGLE_API_KEY": "${localEnv:GOOGLE_API_KEY}",
     "GEMINI_API_KEY": "${localEnv:GOOGLE_API_KEY}"
   },
+  "containerEnv": {
+    "CHEZMOI_SOURCE_DIR": "/home/vscode/.local/share/chezmoi"
+  },
+  "mounts": [
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+    "source=${localEnv:CHEZMOI_SOURCE_DIR},target=/home/vscode/.local/share/chezmoi,type=bind"
+  ],
+  "runArgs": [
+    "--net=host"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -38,5 +49,6 @@
       }
     }
   },
-  "postCreateCommand": ".devcontainer/scripts/setup"
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local",
+  "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup"
 }
