@@ -7,3 +7,6 @@ mise_cmd=$(which mise)
 if command -v $mise_cmd > /dev/null; then
   $mise_cmd trust && $mise_cmd install
 fi
+if command -v tldr > /dev/null; then
+  tldr --update
+fi
