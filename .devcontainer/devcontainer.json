@@ -4,7 +4,9 @@
     "dockerfile": "Dockerfile"
   },
   "features": {
-    "ghcr.io/devcontainers/features/nix:1": {}
+    "ghcr.io/devcontainers/features/nix:1": {
+      "multiUser": false
+    }
   },
   "remoteEnv": {
     "DISPLAY": "${localEnv:DISPLAY}",
