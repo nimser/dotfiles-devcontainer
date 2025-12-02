@@ -15,3 +15,18 @@ augroup numbertoggle
   autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
 augroup END
 ]])
+
+-- Auto-trigger signature help when typing pauses in Insert mode
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client and client:supports_method("textDocument/signatureHelp") then
+      vim.api.nvim_create_autocmd("CursorHoldI", {
+        buffer = args.buf,
+        callback = function()
+          vim.lsp.buf.signature_help({ silent = true, focusable = false })
+        end,
+      })
+    end
+  end,
+})
