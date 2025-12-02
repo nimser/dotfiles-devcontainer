@@ -8,6 +8,10 @@ if [ -d "${HOME}/.local/bin" ];then
   PATH="${PATH}:${HOME}/.local/bin"
 fi
 
+if [ -d "${HOME}/.nix-profile/bin" ];then
+  PATH="${PATH}:${HOME}/.nix-profile/bin"
+fi
+
 PATH="${PATH}:${PNPM_HOME}"
 
 if [ -d "${HOME}/.iximiuz/labctl/bin" ]; then
