@@ -11,6 +11,7 @@
         tree
         htop
         luarocks
+        luac
       ];
       server = with pkgs; [
         wakeonlan
