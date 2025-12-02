@@ -59,6 +59,12 @@ local cnoreabbrev = vim.cmd.cnoreabbrev
 -- t[nore]map "t" |  -   |  -  |  -  |  -  |  -  |  -  | yes  |  -   |
 -- l[nore]map "l" |  -   | yes | yes |  -  |  -  |  -  |  -   | yes  |
 
+-- Disable unwanted LazyVim behaviour
+-- restore Neovim 0.11 signature_help
+vim.keymap.del({ "i", "s", "n" }, "<C-s>")
+map({ "i", "s" }, "<C-s>", function() vim.lsp.buf.signature_help() end, { desc = "Signature Help" })
+map('n', '<C-s>', '<Plug>(nvim.lsp.ctrl-s)')
+
 -- Add empty lines before and after cursor line
 map("n", "<S-CR>", "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>")
 map("n", "<CR>", "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>")
