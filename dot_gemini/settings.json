@@ -1,6 +1,7 @@
 {
   "general": {
-    "previewFeatures": true
+    "previewFeatures": true,
+    "preferredEditor": "neovim"
   },
   "advanced": {
     "excludedEnvVars": [
@@ -19,6 +20,9 @@
       "hideContextPercentage": false
     }
   },
+  "tools": {
+    "truncateToolOutputLines": 1000
+  },
   "context": {
     "includeDirectories": [
       ".."
@@ -29,7 +33,7 @@
     "maxSessionTurns": 200,
     "summarizeToolOutput": {
       "run_shell_command": {
-        "tokenBudget": 500
+        "tokenBudget": 10000
       }
     }
   },
