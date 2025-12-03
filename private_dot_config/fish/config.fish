@@ -18,7 +18,7 @@ if status is-interactive
   end
 
   if test -d ~/.rd/bin
-    set -gx fish_user_paths "$HOME/.rd/bin"
+    set -gx --append fish_user_paths "$HOME/.rd/bin"
   end
 
   if type -q mise
