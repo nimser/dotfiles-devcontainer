@@ -37,6 +37,11 @@
       }
     }
   },
+  "experimental": {
+    "codebaseInvestigatorSettings": {
+      "maxNumTurns": 50
+    }
+  },
   "mcpServers": {},
   "telemetry": {},
   "privacy": {
