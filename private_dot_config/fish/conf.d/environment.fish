@@ -1,4 +1,5 @@
 # note: more env-vars are defined in other `conf.d/*` fish configuration files. use `printenv` or the fish `set -S` command to see all vars.
+set -gx CHEZMOI_SOURCE_DIR "$HOME/.local/share/chezmoi" # otherwise set only after chezmoi cd, needed for devpods
 set -gx RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/config"
 set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx SHELL "fish"

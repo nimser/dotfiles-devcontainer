@@ -5,7 +5,8 @@ export MISE_DATA_DIR="${HOME}/.local/share/mise"
 
 
 if [ -d "${HOME}/.local/bin" ];then
-  PATH="${PATH}:${HOME}/.local/bin"
+  # Prepending makes sure ~/.local/bin binaries are prioritized over others
+  PATH="${HOME}/.local/bin:${PATH}"
 fi
 
 if [ -d "${HOME}/.nix-profile/bin" ];then
