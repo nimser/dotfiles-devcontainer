@@ -12,6 +12,7 @@
         htop
         luarocks
         lua
+        jellyfin-ffmpeg
       ];
       server = with pkgs; [
         wakeonlan
