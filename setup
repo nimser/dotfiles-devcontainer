@@ -21,12 +21,22 @@ if ! command -v chezmoi > /dev/null; then
 fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
-# Note: use nix feature instead for devcontainers
-# Try to source existing nix installation
-if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-  source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-elif [ -f /etc/profile.d/nix.sh ]; then
-  source /etc/profile.d/nix.sh
+# and  detect install path from nix feature instead for devcontainers
+for f in /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh /etc/profile.d/nix.sh ~/.nix-profile/etc/profile.d/nix.sh; do
+  if [ -f "$f" ]; then
+    source "$f"
+    break
+  fi
+done
+
+# Fallback: check if nix-env is in common locations and add to PATH
+if ! command -v nix-env &>/dev/null; then
+  for d in /nix/var/nix/profiles/default/bin ~/.nix-profile/bin; do
+    if [ -x "$d/nix-env" ]; then
+      export PATH="$PATH:$d"
+      break
+    fi
+  done
 fi
 
 if ! command -v nix-env &>/dev/null && [ ! -d "/nix" ]; then
