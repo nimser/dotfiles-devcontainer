@@ -22,11 +22,17 @@ fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
 # Note: use nix feature instead for devcontainers
-if [ -f /etc/profile.d/nix.sh ]; then source /etc/profile.d/nix.sh; fi
-if ! command -v nix-env &>/dev/null; then
+# Try to source existing nix installation
+if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [ -f /etc/profile.d/nix.sh ]; then
+  source /etc/profile.d/nix.sh
+fi
+
+if ! command -v nix-env &>/dev/null && [ ! -d "/nix" ]; then
   echo "🥁 nix-env command not found. Attempting to install Nix..."
   sh <(curl -L https://nixos.org/nix/install) --daemon --yes
-  source /etc/profile.d/nix.sh
+  if [ -f /etc/profile.d/nix.sh ]; then source /etc/profile.d/nix.sh; fi
 fi
 
 if [ -f $HOME/.config/nixpkgs/config.nix ]; then
