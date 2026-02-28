@@ -21,9 +21,10 @@
   "containerEnv": {
     "CHEZMOI_SOURCE_DIR": "/home/vscode/.local/share/chezmoi"
   },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/.local/share/chezmoi,type=bind",
+  "workspaceFolder": "/home/vscode/.local/share/chezmoi",
   "mounts": [
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-    "source=${localEnv:CHEZMOI_SOURCE_DIR},target=/home/vscode/.local/share/chezmoi,type=bind"
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
   ],
   "runArgs": [
     "--net=host"
