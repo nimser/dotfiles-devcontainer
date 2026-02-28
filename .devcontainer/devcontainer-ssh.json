@@ -8,9 +8,11 @@
       "multiUser": false
     }
   },
-  "remoteEnv": {
-    "DISPLAY": "${localEnv:DISPLAY}",
+  "containerEnv": {
+    "CHEZMOI_SOURCE_DIR": "/home/vscode/.local/share/chezmoi",
+    "DISPLAY": ":100",
     "GITHUB_TOKEN": "${localEnv:GITHUB_PAT_PUBLIC_REPO}",
+    "AQUA_GITHUB_TOKEN": "${localEnv:GITHUB_PAT_PUBLIC_REPO}",
     "GIT_COMMITTER_EMAIL": "${localEnv:GIT_COMMITTER_EMAIL}",
     "GIT_COMMITTER_NAME": "${localEnv:GIT_COMMITTER_NAME}",
     "GIT_AUTHOR_NAME": "${localEnv:GIT_AUTHOR_NAME}",
@@ -18,14 +20,8 @@
     "GOOGLE_API_KEY": "${localEnv:GOOGLE_API_KEY}",
     "GEMINI_API_KEY": "${localEnv:GOOGLE_API_KEY}"
   },
-  "containerEnv": {
-    "CHEZMOI_SOURCE_DIR": "/home/vscode/.local/share/chezmoi"
-  },
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/.local/share/chezmoi,type=bind",
   "workspaceFolder": "/home/vscode/.local/share/chezmoi",
-  "mounts": [
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
-  ],
   "runArgs": [
     "--net=host"
   ],
@@ -53,5 +49,7 @@
     }
   },
   "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local",
-  "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup"
+  "updateContentCommand": "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 && wget -qO - https://xpra.org/gpg.asc | sudo gpg --dearmor -o /usr/share/keyrings/xpra.gpg && . /etc/os-release && echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/xpra.gpg] https://xpra.org/ $VERSION_CODENAME main\" | sudo tee /etc/apt/sources.list.d/xpra.list && sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xpra xvfb",
+  "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup",
+  "postStartCommand": "mkdir -p /tmp/xpra-runtime && env XDG_RUNTIME_DIR=/tmp/xpra-runtime xpra start :100 --bind-tcp=0.0.0.0:10000 --daemon=yes --mdns=no --auth=none"
 }
