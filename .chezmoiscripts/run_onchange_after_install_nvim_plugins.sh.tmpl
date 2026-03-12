@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+# lazy config hash: {{ include "private_dot_config/nvim/lua/config/lazy.lua" | sha256sum }}
+
+set -euo pipefail
+
+mise_cmd=$(which mise)
+
+if command -v $mise_cmd > /dev/null; then
+  echo "🥁 Starting Neovim plugin sync in the background..."
+  mkdir -p ~/.local/state/nvim
+  nohup $mise_cmd exec neovim -- nvim --headless "+Lazy! sync" +qa > ~/.local/state/nvim/lazy-sync.log 2>&1 &
+fi
