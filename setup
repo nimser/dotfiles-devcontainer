@@ -48,6 +48,7 @@ fi
 if [ -f $HOME/.config/nixpkgs/config.nix ]; then
   # Set system type if not provided via cli
   export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
+  export NIX_REMOTE=""
   # Install all packages defined in config.nix
   nix-env -iA nixpkgs.myPackages --impure
 else
