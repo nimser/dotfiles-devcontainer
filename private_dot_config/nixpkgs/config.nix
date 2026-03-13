@@ -13,6 +13,7 @@
         luarocks
         lua
         jellyfin-ffmpeg
+        google-chrome
       ];
       server = with pkgs; [
         wakeonlan
