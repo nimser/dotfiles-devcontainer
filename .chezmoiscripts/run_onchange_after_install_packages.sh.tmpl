@@ -10,3 +10,7 @@ fi
 if command -v tldr > /dev/null; then
   tldr --update
 fi
+if command -v bat > /dev/null; then
+  # needed to load the custom colorscheme
+  bat cache --build
+fi
