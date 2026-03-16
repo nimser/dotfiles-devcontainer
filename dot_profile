@@ -1,8 +1,29 @@
 #!/bin/sh
 
+# NOTE: env vars that should always be available are declared directly in this file.
+# Those that need encryption are decrypted in ~/.environment and loaded here
+# Those that are tied to graphical environment are loaded from ~/.xsessionrc
+# Those that are shell-specific (nushell, fish...) are loaded from there specific shell conf
+
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 export MISE_DATA_DIR="${HOME}/.local/share/mise"
 
+
+# First login: decrypt encrypted chezmoi files
+if command -v chezmoi >/dev/null 2>&1; then
+  if command -v gpg >/dev/null 2>&1 && gpg --list-secret-keys >/dev/null 2>&1; then
+    if [ ! -f "$HOME/.environment" ]; then
+      printf '\033[32m>> First connection detected: Decrypting chezmoi secrets...\033[0m\n'
+      chezmoi apply --include=encrypted
+      printf '\033[32m>> Secrets decrypted successfully.\033[0m\n'
+    fi
+  fi
+fi
+
+# Source the secrets so they are available to the current shell environment
+if [ -f "$HOME/.environment" ]; then
+  . "$HOME/.environment"
+fi
 
 if [ -d "${HOME}/.local/bin" ];then
   # Prepending makes sure ~/.local/bin binaries are prioritized over others
