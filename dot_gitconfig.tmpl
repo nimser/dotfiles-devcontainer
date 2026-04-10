@@ -1,7 +1,8 @@
 [core]
   pager = delta
   editor = nvim
-  excludesFile = .gitignore.local
+  excludesFile = ~/.gitignore.everywhere
+  excludesFile = .gitignore.local # Deprecated: use native per-project .git/info/exclude instead
 [commit]
   # Note: before disabling, consider `--no-gpg-sign` where needed
   # example: git rebase --interactive --no-gpg-sign && git commit --amend

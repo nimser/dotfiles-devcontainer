@@ -1,0 +1,22 @@
+# Note: use e.g. `!.oxfmtrc.json` in `.git/info/exclude` for projects where any of these files should be tracked
+
+# private files
+.env
+
+# local linting / formating rules
+.oxfmtrc.json
+.oxfmtrc.jsonc
+.dprint.json
+.dprint.jsonc
+
+# build output and package deps
+node_modules/
+dist/
+
+# Core dumps and common unwanted logs
+core.[0-9]*
+*.core
+
+# OS generated files
+.DS_Store
+Thumbs.db
