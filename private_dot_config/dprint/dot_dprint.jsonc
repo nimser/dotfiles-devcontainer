@@ -1,0 +1,10 @@
+{
+  "markdown": {
+    "textWrap": "maintain",
+    "lineWidth": 10000,
+    "emphasisKind": "underscores",
+    "strongKind": "asterisks"
+  },
+  "includes": ["**/*.md"],
+  "plugins": ["https://plugins.dprint.dev/markdown-0.21.1.wasm"]
+}
