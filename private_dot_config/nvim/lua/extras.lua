@@ -16,9 +16,7 @@ local function is_js_project(path)
     ".eslintrc.js",
   }
   for _, indicator in ipairs(indicators) do
-    if (vim.uv or vim.loop).fs_stat(path .. "/" .. indicator) then
-      return true
-    end
+    if (vim.uv or vim.loop).fs_stat(path .. "/" .. indicator) then return true end
   end
   return false
 end
@@ -28,8 +26,11 @@ local cwd = vim.fn.getcwd()
 local root = vim.fs.find(".git", { path = cwd, upward = true })[1]
 local git_root = root and vim.fn.fnamemodify(root, ":h") or nil
 
-if is_js_project(cwd) or is_js_project("/workspaces") or (git_root and is_js_project(git_root)) then
-  table.insert(extras, { import = "lazyvim.plugins.extras.lang.typescript" })
+if is_js_project(cwd) or is_js_project("/workspaces") or is_js_project(git_root) then
+  vim.list_extend(extras, {
+    { import = "lazyvim.plugins.extras.lang.typescript" },
+    { import = "lazyvim.plugins.extras.lang.typescript.oxc" },
+  })
 end
 
 return extras
