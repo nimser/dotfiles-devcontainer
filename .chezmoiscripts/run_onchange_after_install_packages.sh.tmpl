@@ -3,46 +3,14 @@
 
 set -euo pipefail
 
-log_dir="$HOME/.local/state/chezmoi"
-mkdir -p "$log_dir"
-log_file="$log_dir/install_packages.log"
-
-# Run commands in a block, redirecting everything to the log file to prevent pager interference
-{
-  echo "Starting package installation at $(date)"
-
-  mise_cmd=$(which mise)
-  if command -v $mise_cmd > /dev/null; then
-    $mise_cmd trust && $mise_cmd install
-  fi
-  if command -v tldr > /dev/null; then
-    tldr --update
-  fi
-  if command -v bat > /dev/null; then
-    # needed to load the custom colorscheme
-    bat cache --build
-  fi
-
-  echo "Finished package installation at $(date)"
-} > "$log_file" 2>&1
-
-# Parse the log file and print ONLY the summary of what changed
-installed_tools=$(grep "✓ installed" "$log_file" || true)
-
-if [ -n "$installed_tools" ]; then
-    # Launch a background process to print the summary after chezmoi and delta exit.
-    # We redirect stdin/stdout/stderr to /dev/null so chezmoi/delta pipes are closed immediately.
-    export INSTALLED_TOOLS="$installed_tools"
-    nohup bash -c '
-        # Wait for the chezmoi process to finish to ensure the pager is closed and terminal is free
-        while pgrep -x chezmoi >/dev/null; do sleep 0.1; done
-        
-        # Give the terminal a fraction of a second to fully restore its state from delta/less
-        sleep 0.2
-        
-        # Print the update summary directly to the user'\''s terminal
-        if [ -w /dev/tty ]; then
-            echo -e "\n✅ Packages updated:\n$(echo "$INSTALLED_TOOLS" | sed "s/.*mise //g" | awk "{print \"  - \" \$1}")\n" > /dev/tty
-        fi
-    ' </dev/null >/dev/null 2>&1 & disown
+mise_cmd=$(which mise)
+if command -v $mise_cmd > /dev/null; then
+  $mise_cmd trust && $mise_cmd install
+fi
+if command -v tldr > /dev/null; then
+  tldr --update
+fi
+if command -v bat > /dev/null; then
+  # needed to load the custom colorscheme
+  bat cache --build
 fi
