@@ -8,6 +8,12 @@
 .Xresources
 .xprofile
 .XCompose
+.local/bin/rclone-backup.sh
+.config/systemd/user/rclone-backup.service
+.config/systemd/user/rclone-backup.timer
+.config/systemd/user/docker-cleanup.timer
+.config/systemd/user/docker-cleanup.service
+.config/systemd/user/zettelkasten-inotify.service
 {{- end }}
 .config/nvim/lazyvim.json
 _system/**
