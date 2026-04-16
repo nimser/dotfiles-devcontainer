@@ -5,7 +5,7 @@
   },
   "features": {
     "ghcr.io/devcontainers/features/nix:1": {
-      "multiUser": false
+      "multiUser": true
     }
   },
   "remoteEnv": {
@@ -27,7 +27,11 @@
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
   ],
   "runArgs": [
-    "--net=host"
+    "--net=host",
+    "--cap-add=SYS_ADMIN",
+    "--security-opt",
+    "seccomp=unconfined",
+    "--ipc=host"
   ],
   "customizations": {
     "vscode": {
