@@ -6,7 +6,7 @@
       systemType = builtins.getEnv "SYSTEM_TYPE";
 
       base = with pkgs; [
-        pass
+        socat
         gcc
         tree
         htop

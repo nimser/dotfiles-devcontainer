@@ -49,8 +49,8 @@ if [ -f $HOME/.config/nixpkgs/config.nix ]; then
   # Set system type if not provided via cli
   export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
   export NIX_REMOTE=""
-  # Install all packages defined in config.nix
-  nix-env -iA nixpkgs.myPackages --impure
+  # Install all packages defined in install.nix
+  nix-env -f $HOME/.config/nixpkgs/install.nix -iA myPackages --impure
 else
   echo "💥 ERROR: Nix configuration file not found"
   echo "Ensure chezmoi has run and deployed it correctly."
