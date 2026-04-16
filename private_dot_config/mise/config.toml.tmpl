@@ -1,5 +1,11 @@
+# vim: set filetype=toml:
 [tools]
-{{- if ne .chezmoi.hostname "tpad"}}
+{{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")))}} 
+# only for tpad itself, excluding containers running on it
+"github:yt-dlp/yt-dlp" = "latest"
+{{- end }}
+{{- if ne .chezmoi.hostname "tpad"}} 
+# for all hosts other than tpad (containers or not)
 kubectl = "latest"
 kubectx = "latest"
 kubens = "latest"
@@ -7,12 +13,13 @@ helm = "latest"
 "aqua:k9s" = "latest"
 "aqua:fluxcd/flux2" = "latest"
 {{- end}}
-{{- if eq .chezmoi.hostname "tpad"}}
-"github:yt-dlp/yt-dlp" = "latest"
+{{- if not (stat "/.dockerenv") }} 
+# for hosts that are not a container
+"github:olastor/age-plugin-fido2-hmac" = "latest"
+"github:Foxboron/age-plugin-tpm" = "latest"
 {{- end}}
 chezmoi = "latest"
 neovim = "latest"
-difftastic = "latest"
 delta = "latest"
 lazygit = "latest"
 bat = "latest"
@@ -28,10 +35,10 @@ bat = "latest"
 direnv = "latest"
 node = "latest"
 "vfox:https://github.com/markmals/mise-vite-plus" = "latest"
-pnpm = "latest"
 "github:sst/opencode" = "latest"
 fzf = "latest"
 age = "latest"
+gopass = "latest"
 sops = "latest"
 gcloud = "latest"
 [settings]
