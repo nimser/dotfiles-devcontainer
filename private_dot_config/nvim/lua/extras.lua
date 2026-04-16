@@ -6,6 +6,7 @@ local extras = {
 }
 
 local function is_js_project(path)
+  if not path then return false end
   local indicators = {
     "package.json",
     "tsconfig.json",
@@ -13,7 +14,7 @@ local function is_js_project(path)
     "deno.json",
     "deno.jsonc",
     ".eslintrc.json",
-    ".eslintrc.js",
+    ".eslintrc.js"
   }
   for _, indicator in ipairs(indicators) do
     if (vim.uv or vim.loop).fs_stat(path .. "/" .. indicator) then return true end
