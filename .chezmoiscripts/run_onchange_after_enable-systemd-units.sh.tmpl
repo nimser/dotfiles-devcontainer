@@ -5,7 +5,7 @@
 # docker-cleanup.service hash: {{ include "private_dot_config/systemd/user/docker-cleanup.service" | sha256sum }}
 # zettelkasten-inotify.service hash: {{ include "private_dot_config/systemd/user/zettelkasten-inotify.service" | sha256sum }}
 # rclone-backup.timer hash: {{ include "private_dot_config/systemd/user/rclone-backup.timer" | sha256sum }}
-# rclone-backup.service hash: {{ include "private_dot_config/systemd/user/rclone-backup.service" | sha256sum }}
+# rclone-backup.service hash: {{ include "private_dot_config/systemd/user/encrypted_rclone-backup.service.asc" | sha256sum }}
 {{- end }}
 
 set -euo pipefail
