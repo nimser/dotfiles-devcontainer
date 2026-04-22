@@ -3,9 +3,9 @@
 {{- if eq .chezmoi.hostname "tpad" }}
 # docker-cleanup.timer hash: {{ include "private_dot_config/systemd/user/docker-cleanup.timer" | sha256sum }}
 # docker-cleanup.service hash: {{ include "private_dot_config/systemd/user/docker-cleanup.service" | sha256sum }}
-# zettelkasten-inotify.service hash: {{ include "private_dot_config/systemd/user/zettelkasten-inotify.service" | sha256sum }}
+# zettelkasten-inotify.service hash: {{ include "private_dot_config/systemd/user/encrypted_zettelkasten-inotify.service.age" | sha256sum }}
 # rclone-backup.timer hash: {{ include "private_dot_config/systemd/user/rclone-backup.timer" | sha256sum }}
-# rclone-backup.service hash: {{ include "private_dot_config/systemd/user/encrypted_rclone-backup.service.asc" | sha256sum }}
+# rclone-backup.service hash: {{ include "private_dot_config/systemd/user/encrypted_rclone-backup.service.age" | sha256sum }}
 {{- end }}
 
 set -euo pipefail
