@@ -3,6 +3,10 @@
   editor = nvim
   excludesFile = ~/.gitignore.everywhere
   excludesFile = .gitignore.local # Deprecated: use native per-project .git/info/exclude instead
+[gpg]
+  format = ssh
+[user]
+  signingkey = ~/.ssh/git-signing.pub
 [commit]
   # Note: before disabling, consider `--no-gpg-sign` where needed
   # example: git rebase --interactive --no-gpg-sign && git commit --amend
@@ -53,7 +57,3 @@
   defaultBranch = main
 [pager]
   branch = false
-{{- if (env "DEVPOD" | eq "true") }}
-[credential]
-  helper = !'/usr/local/bin/devpod' agent git-credentials --port 12049
-{{- end }}
