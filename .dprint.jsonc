@@ -14,15 +14,24 @@
         "command": "shfmt -i 2 -ci -bn",
         "exts": ["sh", "bash"],
         "associations": ["**/*.sh.tmpl"]
+      },
+      {
+        "command": "expand -i -t 2",
+        "exts": ["tmpl"],
+        "associations": ["**/modify_*"]
+      },
+      {
+        "command": "expand -i -t 2",
+        "exts": ["tmpl"],
+        "associations": ["**/.chezmoitemplates/*"]
       }
     ]
   },
   "json": {
-    "trailingCommas": "never"
+    "trailingCommas": "never",
+    "associations": ["!**/modify_*.json"]
   },
-  "excludes": [
-    "**/modify_*.json"
-  ],
+  "excludes": [],
   "plugins": [
     "https://plugins.dprint.dev/json-0.21.3.wasm",
     "https://plugins.dprint.dev/markdown-0.21.1.wasm",
