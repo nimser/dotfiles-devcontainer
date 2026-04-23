@@ -39,13 +39,14 @@ dprint check
 
 ### Template files
 
-| Pattern             | Formatted? | Notes                                                              |
-| ------------------- | ---------- | ------------------------------------------------------------------ |
-| `*.sh.tmpl`         | Yes        | shfmt handles `{{ }}` syntax fine                                  |
-| `*.toml.tmpl`       | Yes        | dprint toml plugin handles `{{ }}` syntax                          |
-| `*.yaml.tmpl`       | Yes        | dprint yaml plugin handles `{{ }}` syntax                          |
-| `modify_*.json`     | **No**     | Pure Go templates that output JSON — JSON parser chokes on `{{ }}` |
-| `modify_*` (no ext) | No         | Pure Go templates, no formatter exists                             |
+| Pattern             | Formatted? | Notes                                                               |
+| ------------------- | ---------- | ------------------------------------------------------------------- |
+| `*.sh.tmpl`         | Yes        | shfmt handles `{{ }}` syntax fine                                   |
+| `*.toml.tmpl`       | Yes        | dprint toml plugin handles `{{ }}` syntax                           |
+| `*.yaml.tmpl`       | Yes        | dprint yaml plugin handles `{{ }}` syntax                           |
+| `modify_*.json`     | Yes        | Uses `expand -i -t 2` to convert tabs without crashing JSON parsers |
+| `modify_*` (no ext) | Yes        | Uses `expand -i -t 2`                                               |
+| `.chezmoitemplates` | Yes        | Uses `expand -i -t 2`                                               |
 
 ### What formats what
 
