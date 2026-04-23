@@ -3,14 +3,26 @@ return {
   cmd = { "ConformInfo" },
   opts = {
     formatters_by_ft = {
-      nix = { "alejandra" },
+      fish = { "fish_indent" },
+      sh = { "shfmt" },
+      bash = { "shfmt" },
+      json = { "dprint" },
+      jsonc = { "dprint" },
       markdown = { "dprint" },
       ["markdown.mdx"] = { "dprint" },
+      toml = { "dprint" },
+      yaml = { "dprint" },
+      yml = { "dprint" },
+      dockerfile = { "dprint" },
+      nix = { "alejandra" },
     },
     default_format_opts = {
       lsp_format = "fallback",
     },
     formatters = {
+      shfmt = {
+        prepend_args = { "-i", "2", "-ci", "-bn" },
+      },
       dprint = {
         require_cwd = false,
         prepend_args = function(self, ctx)
