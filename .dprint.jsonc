@@ -3,13 +3,6 @@
   "indentWidth": 2,
   "useTabs": false,
   "newLineKind": "lf",
-  "markdown": {
-    "textWrap": "maintain",
-    "lineWidth": 10000,
-    "emphasisKind": "underscores",
-    "strongKind": "asterisks"
-  },
-  "includes": ["**/*.md"],
   "exec": {
     "cwd": "${configDir}",
     "commands": [
