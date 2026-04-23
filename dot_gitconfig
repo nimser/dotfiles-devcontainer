@@ -5,6 +5,8 @@
   excludesFile = .gitignore.local # Deprecated: use native per-project .git/info/exclude instead
 [gpg]
   format = ssh
+[gpg "ssh"]
+	allowedSignersFile = /home/owner/.ssh/allowed_signers
 [user]
   signingkey = ~/.ssh/git-signing.pub
 [commit]
