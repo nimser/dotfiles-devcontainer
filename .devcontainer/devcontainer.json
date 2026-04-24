@@ -24,7 +24,8 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/.local/share/chezmoi,type=bind",
   "workspaceFolder": "/home/vscode/.local/share/chezmoi",
   "mounts": [
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+    "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/home/vscode/.ssh/git-signing.pub,type=bind,readonly"
   ],
   "runArgs": [
     "--net=host",

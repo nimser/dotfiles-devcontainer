@@ -22,6 +22,9 @@
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/.local/share/chezmoi,type=bind",
   "workspaceFolder": "/home/vscode/.local/share/chezmoi",
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/home/vscode/.ssh/git-signing.pub,type=bind,readonly"
+  ],
   "runArgs": [
     "--net=host"
   ],
