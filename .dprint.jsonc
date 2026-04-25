@@ -31,7 +31,9 @@
     "trailingCommas": "never",
     "associations": ["!**/modify_*.json"]
   },
-  "excludes": [],
+  "excludes": [
+    "**/.chezmoiscripts/*.sh.tmpl"
+  ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.21.3.wasm",
     "https://plugins.dprint.dev/markdown-0.21.1.wasm",
