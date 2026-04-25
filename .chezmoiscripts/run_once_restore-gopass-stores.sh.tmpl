@@ -1,6 +1,40 @@
 #!/usr/bin/env bash
 {{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv"))) }}
-exec "$HOME/.local/bin/rclone-restore"
+
+STORES_DIR="$HOME/.local/share/gopass/stores"
+RCLONE_BIN="$HOME/.local/bin/rclone"
+SCRIPTS_HOMEDIR="$HOME/.config/gopass/.gopass-scripts"
+
+# 1. Restore bg store first (needed for rclone credentials)
+if [ ! -d "$STORES_DIR/bg/.git" ]; then
+    echo "Restoring bg store from GitLab..."
+    git clone git@gitlab.com:nimser/coffre-fort-bg.git "$STORES_DIR/bg"
+fi
+
+# 2. Restore hil store
+if [ ! -d "$STORES_DIR/hil/.git" ]; then
+    echo "Restoring hil store from GitLab..."
+    git clone git@gitlab.com:nimser/coffre-fort-hil.git "$STORES_DIR/hil"
+fi
+
+# 3. Restore recovery store
+if [ ! -d "$STORES_DIR/recovery/.git" ]; then
+    echo "Restoring recovery store from GitLab..."
+    git clone git@gitlab.com:nimser/coffre-fort-recovery.git "$STORES_DIR/recovery"
+fi
+
+# 4. Restore archive store
+if [ ! -d "$STORES_DIR/archive/.git" ]; then
+    echo "Restoring archive store from GitLab..."
+    git clone git@gitlab.com:nimser/coffre-fort-archive.git "$STORES_DIR/archive"
+fi
+
+# 5. Restore core store from idrive e2 (needs bg store for credentials)
+if [ ! -d "$STORES_DIR/core/.git" ]; then
+    echo "Restoring core store from idrive e2..."
+    GOPASS_HOMEDIR="$SCRIPTS_HOMEDIR" "$RCLONE_BIN" sync e2crypt4:current "$STORES_DIR/core" --links
+fi
+
 {{- else }}
 echo "Not on tpad host or in container, skipping gopass store restoration"
 exit 0
