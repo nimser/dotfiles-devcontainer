@@ -1,4 +1,7 @@
-{{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv"))) }}
 #!/usr/bin/env bash
+{{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv"))) }}
 exec "$HOME/.local/bin/rclone-restore"
+{{- else }}
+echo "Not on tpad host or in container, skipping gopass store restoration"
+exit 0
 {{- end }}
