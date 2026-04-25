@@ -32,7 +32,7 @@
     "associations": ["!**/modify_*.json"]
   },
   "excludes": [
-    "**/.chezmoiscripts/*.sh.tmpl"
+    ".chezmoiscripts/run_once_restore-gopass-stores.sh.tmpl"
   ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.21.3.wasm",
