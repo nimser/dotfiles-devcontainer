@@ -14,6 +14,12 @@
 .config/systemd/user/docker-cleanup.timer
 .config/systemd/user/docker-cleanup.service
 .config/systemd/user/zettelkasten-inotify.service
+.config/systemd/user/age-plugin-tpm-bridge.service
+.config/systemd/user/age-plugin-yubikey-bridge.service
+{{- end }}
+{{- if and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")) }}
+.local/bin/age-plugin-tpm
+.local/bin/age-plugin-yubikey
 {{- end }}
 .config/nvim/lazyvim.json
 _system/**
