@@ -2,10 +2,13 @@
 
 set -euo pipefail
 
+# Fix ~/.ssh ownership since DevPod creates it as root when mounting ~/.ssh/git-signing.pub
+sudo chown -R $(whoami):$(whoami) ~/.ssh 2>/dev/null || true
+
 mise_cmd=$(which mise)
-if command -v $mise_cmd > /dev/null; then
+if command -v $mise_cmd >/dev/null; then
   $mise_cmd trust && $mise_cmd install
 fi
-if command -v chezmoi > /dev/null; then
+if command -v chezmoi >/dev/null; then
   chezmoi apply
 fi

@@ -1,6 +1,21 @@
+{{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv"))) -}}
+{{ include "private_dot_local/bin/executable_rclone-restore" -}}
+{{- else -}}
 #!/usr/bin/env bash
-{{ if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv"))) }}
-exec "$HOME/.local/bin/rclone-restore"
-{{- else }}
-exec "$HOME/.local/bin/rclone-restore" bg
+set -euo pipefail
+
+STORES_DIR="$HOME/.local/share/gopass/stores"
+
+# Set up git-signing.pub symlink (chezmoi already created ~/.ssh with correct perms)
+if [ -f /mnt/host/git-signing.pub ]; then
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+    ln -sf /mnt/host/git-signing.pub ~/.ssh/git-signing.pub
+fi
+
+# Restore bg store from GitLab
+if [ ! -d "$STORES_DIR/bg/.git" ]; then
+    TMP_SSH_DIR=$(mktemp -d)
+    GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5 -o UserKnownHostsFile=$TMP_SSH_DIR/known_hosts" git clone git@gitlab.com:nimser/coffre-fort-bg.git "$STORES_DIR/bg"
+fi
 {{- end }}
