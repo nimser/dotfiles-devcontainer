@@ -25,8 +25,7 @@
   "workspaceFolder": "/home/vscode/.local/share/chezmoi",
   "mounts": [
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-    "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/mnt/host/git-signing.pub,type=bind,readonly",
-    "source=${localEnv:HOME}/.local/share/opencode,target=/home/vscode/.local/share/opencode,type=bind"
+    "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/mnt/host/git-signing.pub,type=bind,readonly"
   ],
   "runArgs": [
     "--net=host",
@@ -58,6 +57,6 @@
       }
     }
   },
-  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local",
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local && sudo chown vscode:vscode /home/vscode/.ssh",
   "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup"
 }
