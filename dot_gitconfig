@@ -6,6 +6,7 @@
 [gpg]
   format = ssh
 [gpg "ssh"]
+  program = ssh-keygen
 	allowedSignersFile = /home/owner/.ssh/allowed_signers
 [user]
   signingkey = ~/.ssh/git-signing.pub
@@ -19,8 +20,8 @@
   default = simple
   autoSetupRemote = true
 [url "git@github.com:"]
-  insteadOf = git://github.com/
-  insteadOf = https://github.com/
+  pushInsteadOf = git://github.com/
+  pushInsteadOf = https://github.com/
 [alias]
   cl = clone
   co = checkout

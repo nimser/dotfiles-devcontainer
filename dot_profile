@@ -8,14 +8,40 @@
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 export MISE_DATA_DIR="${HOME}/.local/share/mise"
 
+# 1. Add mise shims first
+if [ -d "$MISE_DATA_DIR/shims" ]; then
+  PATH="$MISE_DATA_DIR/shims:$PATH"
+fi
+
+# 2. Add other tool paths
+PATH="${PATH}:${PNPM_HOME}"
+if [ -d "${HOME}/.iximiuz/labctl/bin" ]; then
+  PATH="${PATH}:${HOME}/.iximiuz/labctl/bin"
+fi
+
+# 3. Add Nix profile
+if [ -d "${HOME}/.nix-profile/bin" ];then
+  PATH="${PATH}:${HOME}/.nix-profile/bin"
+fi
+
+# 4. Prepend ~/.local/bin LAST so it overrides everything else (including mise shims)
+# This ensures our custom wrappers (like age-plugin-tpm) take precedence over mise-installed binaries
+if [ -d "${HOME}/.local/bin" ];then
+  PATH="${HOME}/.local/bin:${PATH}"
+fi
+
+export PATH
 
 # First login: decrypt encrypted chezmoi files
 if command -v chezmoi >/dev/null 2>&1; then
   if command -v gpg >/dev/null 2>&1 && gpg --list-secret-keys >/dev/null 2>&1; then
     if [ ! -f "$HOME/.environment" ]; then
       printf '\033[32m>> First connection detected: Decrypting chezmoi secrets...\033[0m\n'
-      chezmoi apply --include=encrypted
-      printf '\033[32m>> Secrets decrypted successfully.\033[0m\n'
+      if chezmoi apply --include=encrypted; then
+        printf '\033[32m>> Secrets decrypted successfully.\033[0m\n'
+      else
+        printf '\033[31m>> Failed to decrypt secrets.\033[0m\n'
+      fi
     fi
   fi
 fi
@@ -24,27 +50,6 @@ fi
 if [ -f "$HOME/.environment" ]; then
   . "$HOME/.environment"
 fi
-
-if [ -d "${HOME}/.local/bin" ];then
-  # Prepending makes sure ~/.local/bin binaries are prioritized over others
-  PATH="${HOME}/.local/bin:${PATH}"
-fi
-
-if [ -d "${HOME}/.nix-profile/bin" ];then
-  PATH="${PATH}:${HOME}/.nix-profile/bin"
-fi
-
-PATH="${PATH}:${PNPM_HOME}"
-
-if [ -d "${HOME}/.iximiuz/labctl/bin" ]; then
-  PATH="${PATH}:${HOME}/.iximiuz/labctl/bin"
-fi
-
-if [ -d "$MISE_DATA_DIR/shims" ]; then
-  PATH="$MISE_DATA_DIR/shims:$PATH"
-fi
-
-export PATH
 
 if [ -t 0 ]; then
   if command -v fish > /dev/null 2>&1; then
