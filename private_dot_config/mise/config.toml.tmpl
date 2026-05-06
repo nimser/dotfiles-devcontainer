@@ -4,8 +4,8 @@
 # only for tpad itself, excluding containers running on it
 "github:yt-dlp/yt-dlp" = "latest"
 {{- end }}
-{{- if ne .chezmoi.hostname "tpad"}} 
-# for all hosts other than tpad (containers or not)
+{{- if (eq (env "DEVPOD_WORKSPACE_ID") "homelab")}}
+# only for the homelab devpod
 kubectl = "latest"
 kubectx = "latest"
 kubens = "latest"
