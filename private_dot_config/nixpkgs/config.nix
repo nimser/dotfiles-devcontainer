@@ -23,6 +23,7 @@
         tectonic
         mermaid-cli
         imagemagick
+        scrcpy
       ];
     in {
       myPackages = pkgs.buildEnv {
