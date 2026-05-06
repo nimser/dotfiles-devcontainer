@@ -57,6 +57,6 @@
       }
     }
   },
-  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local && sudo chown vscode:vscode /home/vscode/.ssh",
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local && mkdir -p /home/vscode/.ssh && sudo chown vscode:vscode /home/vscode/.ssh && mkdir -p /home/vscode/.local/state/age-plugin-tpm /home/vscode/.local/state/age-plugin-yubikey",
   "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup"
 }
