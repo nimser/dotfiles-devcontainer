@@ -1,0 +1,107 @@
+contexts:
+  clean:
+    defaultIde: none
+    defaultProvider: docker
+    options:
+      AGENT_INJECT_TIMEOUT:
+        userProvided: true
+        value: "60"
+      GIT_SSH_SIGNATURE_FORWARDING:
+        userProvided: true
+        value: "false"
+      SSH_ADD_PRIVATE_KEYS:
+        userProvided: true
+        value: "false"
+    providers:
+      docker:
+        creationTimestamp: "2025-12-01T16:21:32Z"
+        initialized: true
+        options:
+          DOCKER_BUILDER: {}
+          DOCKER_HOST: {}
+          DOCKER_PATH:
+            value: docker
+          INACTIVITY_TIMEOUT: {}
+      t120:
+        creationTimestamp: "2026-02-26T18:21:23Z"
+        initialized: true
+        options:
+          AGENT_PATH:
+            filled: "2026-02-26T18:21:23Z"
+            value: /tmp/owner/devpod/agent
+          DOCKER_PATH:
+            value: docker
+          EXTRA_FLAGS: {}
+          HOST:
+            userProvided: true
+            value: wilder@t163
+          INACTIVITY_TIMEOUT: {}
+          INJECT_DOCKER_CREDENTIALS:
+            value: "true"
+          INJECT_GIT_CREDENTIALS:
+            value: "true"
+          PORT:
+            value: "22"
+          USE_BUILTIN_SSH:
+            value: "false"
+      t163:
+        creationTimestamp: "2026-04-15T14:40:17Z"
+        initialized: true
+        options:
+          AGENT_PATH:
+            filled: "2026-04-15T14:40:17Z"
+            value: /tmp/owner/devpod/agent
+          DOCKER_PATH:
+            value: docker
+          EXTRA_FLAGS: {}
+          HOST:
+            userProvided: true
+            value: wilder@t163
+          INACTIVITY_TIMEOUT: {}
+          INJECT_DOCKER_CREDENTIALS:
+            value: "true"
+          INJECT_GIT_CREDENTIALS:
+            value: "true"
+          PORT:
+            value: "22"
+          USE_BUILTIN_SSH:
+            value: "false"
+  default:
+    defaultIde: none
+    defaultProvider: docker
+    options:
+      AGENT_INJECT_TIMEOUT:
+        userProvided: true
+        value: "60"
+      DOTFILES_URL:
+        userProvided: true
+        value: git@github.com:nimser/private-dotfiles-devcontainer.git
+      GIT_SSH_SIGNATURE_FORWARDING:
+        userProvided: true
+        value: "false"
+      GPG_AGENT_FORWARDING:
+        userProvided: true
+        value: "false"
+      SSH_ADD_PRIVATE_KEYS:
+        userProvided: true
+        value: "false"
+      SSH_AGENT_FORWARDING:
+        userProvided: true
+        value: "true"
+      SSH_INJECT_DOCKER_CREDENTIALS:
+        userProvided: true
+        value: "true"
+      SSH_INJECT_GIT_CREDENTIALS:
+        userProvided: true
+        value: "true"
+    providers:
+      docker:
+        creationTimestamp: "2025-04-27T14:19:56Z"
+        initialized: true
+        options:
+          DOCKER_BUILDER: {}
+          DOCKER_HOST: {}
+          DOCKER_PATH:
+            value: docker
+          INACTIVITY_TIMEOUT: {}
+defaultContext: clean
