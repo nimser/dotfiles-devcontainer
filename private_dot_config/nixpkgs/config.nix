@@ -14,6 +14,7 @@
         lua
         jellyfin-ffmpeg
         google-chrome
+        brave
       ];
       server = with pkgs; [
         wakeonlan
