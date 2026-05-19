@@ -10,8 +10,10 @@ kubectl = "latest"
 kubectx = "latest"
 kubens = "latest"
 helm = "latest"
+yq = "latest"
 "aqua:k9s" = "latest"
 "aqua:fluxcd/flux2" = "latest"
+"aqua:siderolabs/talos" = "latest" # talosctl
 {{- end}}
 {{- if not (stat "/.dockerenv") }} 
 # for hosts that are not a container
