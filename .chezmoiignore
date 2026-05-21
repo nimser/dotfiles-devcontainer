@@ -1,29 +1,24 @@
 {{- if stat "/.dockerenv" }}
+# In Docker containers (regardless of hostname)
 .devpod/**
-{{- end }}
-{{- if ne .chezmoi.hostname "tpad" }}
+.ssh/config
 .gnupg/gpg-agent.conf
 .gnupg/gpg.conf
-.ssh/config
 .config/nvim/lazyvim.json
+.config/systemd
 .Xmodmap
 .xsessionrc
 .Xresources
 .xprofile
 .XCompose
 .local/bin/rclone-backup.sh
-.config/systemd/user/rclone-backup.service
-.config/systemd/user/rclone-backup.timer
-.config/systemd/user/docker-cleanup.timer
-.config/systemd/user/docker-cleanup.service
-.config/systemd/user/zettelkasten-inotify.service
-.config/systemd/user/age-plugin-tpm-bridge.service
-.config/systemd/user/age-plugin-yubikey-bridge.service
 {{- end }}
-{{- if and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")) }}
+{{- if not (stat "/.dockerenv") }}
+# On host outside Docker
 .local/bin/age-plugin-tpm
 .local/bin/age-plugin-yubikey
 {{- end }}
+# Always ignored
 .config/nvim/lazyvim.json
 _system/**
 _utils/**
