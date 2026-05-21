@@ -6,7 +6,10 @@
 # zettelkasten-inotify.service hash: {{ include "private_dot_config/systemd/user/encrypted_zettelkasten-inotify.service.age" | sha256sum }}
 # rclone-backup.timer hash: {{ include "private_dot_config/systemd/user/rclone-backup.timer" | sha256sum }}
 # rclone-backup.service hash: {{ include "private_dot_config/systemd/user/encrypted_rclone-backup.service.age" | sha256sum }}
-# age-plugin-tpm-bridge.service hash: {{ include "private_dot_config/systemd/user/age-plugin-tpm-bridge.service" | sha256sum }}
+# age-plugin-tpm-bridge-identity.service hash: {{ include "private_dot_config/systemd/user/age-plugin-tpm-bridge-identity.service" | sha256sum }}
+# age-plugin-tpm-bridge-recipient.service hash: {{ include "private_dot_config/systemd/user/age-plugin-tpm-bridge-recipient.service" | sha256sum }}
+# age-plugin-yubikey-bridge-identity.service hash: {{ include "private_dot_config/systemd/user/age-plugin-yubikey-bridge-identity.service" | sha256sum }}
+# age-plugin-yubikey-bridge-recipient.service hash: {{ include "private_dot_config/systemd/user/age-plugin-yubikey-bridge-recipient.service" | sha256sum }}
 {{- end }}
 
 set -euo pipefail
@@ -22,11 +25,17 @@ systemctl --user daemon-reload
 systemctl --user enable docker-cleanup.timer
 systemctl --user enable zettelkasten-inotify.service
 systemctl --user enable rclone-backup.timer
-systemctl --user enable age-plugin-tpm-bridge.service
+systemctl --user enable age-plugin-tpm-bridge-identity.service
+systemctl --user enable age-plugin-tpm-bridge-recipient.service
+systemctl --user enable age-plugin-yubikey-bridge-identity.service
+systemctl --user enable age-plugin-yubikey-bridge-recipient.service
 
 # Restart them to pick up any changes (and start them if they weren't running)
 systemctl --user restart docker-cleanup.timer
 systemctl --user restart zettelkasten-inotify.service
 systemctl --user restart rclone-backup.timer
-systemctl --user restart age-plugin-tpm-bridge.service
+systemctl --user restart age-plugin-tpm-bridge-identity.service
+systemctl --user restart age-plugin-tpm-bridge-recipient.service
+systemctl --user restart age-plugin-yubikey-bridge-identity.service
+systemctl --user restart age-plugin-yubikey-bridge-recipient.service
 {{- end }}
