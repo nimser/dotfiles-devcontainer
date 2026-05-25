@@ -1,26 +1,5 @@
 # vim: set filetype=toml:
 [tools]
-{{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")))}} 
-# only for tpad itself, excluding containers running on it
-"github:yt-dlp/yt-dlp" = "latest"
-{{- end }}
-{{- if (eq (env "DEVPOD_WORKSPACE_ID") "homelab")}}
-# only for the homelab devpod
-kubectl = "latest"
-kubectx = "latest"
-kubens = "latest"
-helm = "latest"
-yq = "latest"
-"aqua:k9s" = "latest"
-"aqua:fluxcd/flux2" = "latest"
-"aqua:siderolabs/talos" = "latest" # talosctl
-{{- end}}
-{{- if not (stat "/.dockerenv") }} 
-# for hosts that are not a container
-"github:olastor/age-plugin-fido2-hmac" = "latest"
-"github:Foxboron/age-plugin-tpm" = "latest"
-"github:str4d/age-plugin-yubikey" = "0.5.0"
-{{- end}}
 chezmoi = "latest"
 neovim = "latest"
 delta = "latest"
@@ -48,5 +27,27 @@ age = "latest"
 gopass = "1.17.0-rc.1"
 sops = "latest"
 gcloud = "latest"
+yq = "latest"
+jq = "1.8.1"
+{{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")))}} 
+# only for tpad itself, excluding containers running on it
+"github:yt-dlp/yt-dlp" = "latest"
+{{- end }}
+{{- if (eq (env "DEVPOD_WORKSPACE_ID") "homelab")}}
+# only for the homelab devpod
+kubectl = "latest"
+kubectx = "latest"
+kubens = "latest"
+helm = "latest"
+"aqua:k9s" = "latest"
+"aqua:fluxcd/flux2" = "latest"
+"aqua:siderolabs/talos" = "latest" # talosctl
+{{- end}}
+{{- if not (stat "/.dockerenv") }} 
+# for hosts that are not a container
+"github:olastor/age-plugin-fido2-hmac" = "latest"
+"github:Foxboron/age-plugin-tpm" = "latest"
+"github:str4d/age-plugin-yubikey" = "0.5.0"
+{{- end}}
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
