@@ -1,3 +1,19 @@
+#!/bin/bash
+# chezmoi modify script for .gitconfig
+# Preserves unmanaged sections (like [credential] injected by DevPod)
+
+# Read current file from stdin
+current=$(cat)
+
+# Extract unmanaged sections (e.g., [credential] injected by DevPod)
+preserved=$(echo "$current" | awk '
+  /^\[credential\]/ { found=1 }
+  /^\[/ && !/^\[credential\]/ { found=0 }
+  found { print }
+')
+
+# Write our managed template
+cat << 'MANAGED'
 [core]
   pager = delta
   editor = nvim
@@ -59,3 +75,9 @@
   defaultBranch = main
 [pager]
   branch = false
+MANAGED
+
+# Append preserved sections if any
+if [ -n "$preserved" ]; then
+  echo "$preserved"
+fi
