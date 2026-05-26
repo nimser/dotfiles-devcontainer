@@ -1,5 +1,6 @@
 # vim: set filetype=toml:
 [tools]
+# base, EVERYWHERE
 chezmoi = "latest"
 neovim = "latest"
 delta = "latest"
@@ -26,7 +27,7 @@ fzf = "latest"
 age = "latest"
 gopass = "1.17.0-rc.1"
 sops = "latest"
-gcloud = "latest"
+#gcloud = "latest"
 yq = "latest"
 jq = "1.8.1"
 {{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")))}} 
