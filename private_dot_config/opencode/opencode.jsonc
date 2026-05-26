@@ -1,0 +1,60 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "google-vertex/gemini-3.1-pro-preview-customtools",
+  "small_model": "google/gemini-3-flash-preview",
+  "autoupdate": false,
+  "provider": {
+    "alibaba": {
+      "name": "Alibaba (DashScope)",
+      "env": ["ALIBABA_API_KEY"],
+      "options": {
+        "baseURL": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+      },
+      "models": {
+        "qwen3.7-max": {
+          "id": "qwen3.7-max",
+          "name": "Qwen 3.7 Max",
+          "reasoning": true,
+          "tool_call": true,
+          "temperature": true,
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          },
+          "cost": {
+            "input": 2.5,
+            "output": 7.5,
+            "cache_read": 0.25,
+            "cache_write": 3.125
+          }
+        },
+        "qwen3.6-plus": {
+          "id": "qwen3.6-plus",
+          "name": "Qwen 3.6 Plus",
+          "reasoning": true,
+          "tool_call": true,
+          "temperature": true,
+          "attachment": true,
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          },
+          "cost": {
+            "input": 0.5,
+            "output": 3,
+            "cache_read": 0.05,
+            "cache_write": 0.625
+          }
+        }
+      }
+    }
+  }
+}
