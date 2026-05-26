@@ -12,6 +12,10 @@
 .xprofile
 .XCompose
 .local/bin/rclone-backup.sh
+.config/gopass/.core-onedot
+.config/gopass/.core-twodots
+.config/gopass/.hil-bg-onedot
+.config/gopass/.hil-bg-twodots
 {{- end }}
 {{- if not (stat "/.dockerenv") }}
 # On host outside Docker
