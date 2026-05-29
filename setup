@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -euo pipefail
+set -uo pipefail
+
+errors=()
 
 LOCAL_BIN="$HOME/.local/bin"
 GPGID=0x03BC4AD253B82986
@@ -12,12 +14,17 @@ if [ -d "$LOCAL_BIN" ] && [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
 fi
 
 # Setup gpg
-gpg --receive-keys $GPGID
+if ! gpg --receive-keys $GPGID; then
+  errors+=("GPG key retrieval failed — run 'gpg --receive-keys $GPGID' manually")
+fi
 
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
-  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted
-  echo "🥁 Only non-encrypted files where applied. Please run 'chezmoi apply --include=encrypted' if needed."
+  if sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted; then
+    echo "🥁 Only non-encrypted files where applied. Please run 'chezmoi apply --include=encrypted' if needed."
+  else
+    errors+=("chezmoi init/apply failed — install chezmoi manually or check network connection")
+  fi
 fi
 
 # Install nix for dependencies that don't have a binary on github (would use mise otherwise)
@@ -41,21 +48,46 @@ fi
 
 if ! command -v nix-env &>/dev/null && [ ! -d "/nix" ]; then
   echo "🥁 nix-env command not found. Attempting to install Nix..."
-  sh <(curl -L https://nixos.org/nix/install) --daemon --yes
-  if [ -f /etc/profile.d/nix.sh ]; then source /etc/profile.d/nix.sh; fi
+  if sh <(curl -L https://nixos.org/nix/install) --daemon --yes; then
+    if [ -f /etc/profile.d/nix.sh ]; then source /etc/profile.d/nix.sh; fi
+  else
+    errors+=("Nix installation failed — reinstall shell or source /etc/profile.d/nix.sh")
+  fi
 fi
 
-if [ -f $HOME/.config/nixpkgs/config.nix ]; then
-  # Set system type if not provided via cli
-  export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
-  export NIX_REMOTE=""
-  # Install all packages defined in install.nix
-  nix-env -f $HOME/.config/nixpkgs/install.nix -iA myPackages --impure
+if command -v nix-env &>/dev/null; then
+  if [ -f $HOME/.config/nixpkgs/config.nix ]; then
+    # Set system type if not provided via cli
+    export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
+    export NIX_REMOTE=""
+    # Install all packages defined in install.nix
+    if ! nix-env -f $HOME/.config/nixpkgs/install.nix -iA myPackages --impure; then
+      errors+=("nix-env install failed — run 'nix-env -f ~/.config/nixpkgs/install.nix -iA myPackages --impure' manually")
+    fi
+  else
+    echo "💥 WARNING: Nix configuration file not found"
+    echo "Ensure chezmoi has run and deployed it correctly."
+    errors+=("Nix config not found at ~/.config/nixpkgs/config.nix — check chezmoi apply")
+  fi
 else
-  echo "💥 ERROR: Nix configuration file not found"
-  echo "Ensure chezmoi has run and deployed it correctly."
+  echo "⚠️  nix-env not available after install attempt — skipping nix package install"
+  echo "   Restart your shell or run: source /etc/profile.d/nix.sh && nix-env -f $HOME/.config/nixpkgs/install.nix -iA myPackages --impure"
+  errors+=("nix-env not available — packages from install.nix were not installed")
+fi
+
+# Summary
+if [ ${#errors[@]} -gt 0 ]; then
+  echo ""
+  echo "╔════════════════════════════════════════════════════════╗"
+  echo "║  ⚠️  Setup completed with errors                       ║"
+  echo "╠════════════════════════════════════════════════════════╣"
+  for err in "${errors[@]}"; do
+    echo "║  ❌ $err"
+  done
+  echo "╚════════════════════════════════════════════════════════╝"
+  echo ""
   exit 1
 fi
 
-echo "Finished setting up dotfiles"
+echo "✅ Finished setting up dotfiles"
 exit 0
