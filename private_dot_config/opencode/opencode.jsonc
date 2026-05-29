@@ -17,6 +17,7 @@
           "reasoning": true,
           "tool_call": true,
           "temperature": true,
+          "supportsDeveloperRole": false,
           "modalities": {
             "input": ["text"],
             "output": ["text"]
@@ -39,6 +40,7 @@
           "tool_call": true,
           "temperature": true,
           "attachment": true,
+          "supportsDeveloperRole": false,
           "modalities": {
             "input": ["text", "image"],
             "output": ["text"]
