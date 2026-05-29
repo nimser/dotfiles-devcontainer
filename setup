@@ -36,7 +36,7 @@ for f in /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh /etc/profile.
   fi
 done
 
-# Fallback: check if nix-env is in common locations and add to PATH
+# Fallback: aggressively hunt for nix-env anywhere under /nix or ~/.nix-profile
 if ! command -v nix-env &>/dev/null; then
   for d in /nix/var/nix/profiles/default/bin ~/.nix-profile/bin; do
     if [ -x "$d/nix-env" ]; then
@@ -44,6 +44,13 @@ if ! command -v nix-env &>/dev/null; then
       break
     fi
   done
+  # Last resort: find the binary wherever it lives
+  if ! command -v nix-env &>/dev/null; then
+    nix_env_path=$(find /nix /root/.nix-profile "$HOME/.nix-profile" -name nix-env -type f 2>/dev/null | head -1 || true)
+    if [ -n "$nix_env_path" ] && [ -x "$nix_env_path" ]; then
+      export PATH="$PATH:$(dirname "$nix_env_path")"
+    fi
+  fi
 fi
 
 if ! command -v nix-env &>/dev/null && [ ! -d "/nix" ]; then
@@ -76,7 +83,7 @@ else
 fi
 
 # Summary
-if [ ${#errors[@]} -gt 0 ]; then
+if [ "${#errors[@]}" -gt 0 ]; then
   echo ""
   echo "╔════════════════════════════════════════════════════════╗"
   echo "║  ⚠️  Setup completed with errors                       ║"
@@ -86,7 +93,8 @@ if [ ${#errors[@]} -gt 0 ]; then
   done
   echo "╚════════════════════════════════════════════════════════╝"
   echo ""
-  exit 1
+  echo "   🏁 Setup continues — workspace will still be usable. Fix the above at your convenience."
+  echo ""
 fi
 
 echo "✅ Finished setting up dotfiles"

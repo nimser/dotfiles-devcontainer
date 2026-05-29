@@ -32,7 +32,7 @@ if command -v chezmoi &>/dev/null; then
 fi
 
 # Summary
-if [ ${#errors[@]} -gt 0 ]; then
+if [ "${#errors[@]}" -gt 0 ]; then
   echo ""
   echo "╔════════════════════════════════════════════════════════╗"
   echo "║  ⚠️  Devcontainer setup completed with errors          ║"
