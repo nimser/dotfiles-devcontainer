@@ -1,11 +1,47 @@
 #!/usr/bin/bash
 
-set -euo pipefail
+# Resilient setup: continue on individual step failures, collect errors,
+# and report them at the end with remediation hints.
 
-mise_cmd=$(which mise)
-if command -v $mise_cmd >/dev/null; then
-  $mise_cmd trust && $mise_cmd install
+set +e  # Do not exit on error — we handle failures explicitly
+
+errors=()
+
+mise_cmd=""
+if command -v mise &>/dev/null; then
+  mise_cmd=$(command -v mise)
 fi
-if command -v chezmoi >/dev/null; then
-  chezmoi apply
+
+if [ -n "$mise_cmd" ]; then
+  echo "🔧 Running mise trust..."
+  $mise_cmd trust || {
+    errors+=("mise trust failed — tool configurations may not be trusted. Run: mise trust")
+  }
+
+  echo "🔧 Running mise install..."
+  $mise_cmd install || {
+    errors+=("mise install had errors — run 'mise install' to retry, or 'mise ls' to check tool status")
+  }
 fi
+
+if command -v chezmoi &>/dev/null; then
+  echo "🏠 Applying chezmoi configuration..."
+  chezmoi apply || {
+    errors+=("chezmoi apply failed — run 'chezmoi apply' manually to retry")
+  }
+fi
+
+# Summary
+if [ ${#errors[@]} -gt 0 ]; then
+  echo ""
+  echo "╔════════════════════════════════════════════════════════╗"
+  echo "║  ⚠️  Devcontainer setup completed with errors          ║"
+  echo "╠════════════════════════════════════════════════════════╣"
+  for err in "${errors[@]}"; do
+    echo "║  ❌ $err"
+  done
+  echo "╚════════════════════════════════════════════════════════╝"
+  echo ""
+fi
+
+exit 0  # Always exit 0 so the chained main setup script still runs
