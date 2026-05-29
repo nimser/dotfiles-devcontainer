@@ -49,10 +49,12 @@
     "openrouter": {
       "modelOverrides": {
         "qwen/qwen3.7-max": {
-          "cost": { "input": 2.5, "output": 7.5, "cacheRead": 2.5, "cacheWrite": 2.5 }
+          "cost": { "input": 2.5, "output": 7.5, "cacheRead": 2.5, "cacheWrite": 2.5 },
+          "compat": { "supportsDeveloperRole": false }
         },
         "qwen/qwen3.6-plus": {
-          "cost": { "input": 0.325, "output": 1.95, "cacheRead": 0.325, "cacheWrite": 0.40625 }
+          "cost": { "input": 0.325, "output": 1.95, "cacheRead": 0.325, "cacheWrite": 0.40625 },
+          "compat": { "supportsDeveloperRole": false }
         }
       }
     }
