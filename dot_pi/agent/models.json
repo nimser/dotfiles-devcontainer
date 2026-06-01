@@ -58,6 +58,10 @@
         },
         "qwen/qwen3.5-flash-02-23": {
           "compat": { "supportsDeveloperRole": false }
+        },
+        "qwen/qwen3.6-flash": {
+          "cost": { "input": 0.1875, "output": 1.125, "cacheRead": 0.1875, "cacheWrite": 0.234375 },
+          "compat": { "supportsDeveloperRole": false }
         }
       }
     }
