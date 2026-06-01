@@ -3,7 +3,7 @@
     "alibaba": {
       "baseUrl": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
       "api": "openai-completions",
-      "apiKey": "ALIBABA_API_KEY",
+      "apiKey": "$ALIBABA_API_KEY",
       "compat": {
         "supportsDeveloperRole": false
       },
@@ -54,6 +54,9 @@
         },
         "qwen/qwen3.6-plus": {
           "cost": { "input": 0.325, "output": 1.95, "cacheRead": 0.325, "cacheWrite": 0.40625 },
+          "compat": { "supportsDeveloperRole": false }
+        },
+        "qwen/qwen3.5-flash-02-23": {
           "compat": { "supportsDeveloperRole": false }
         }
       }
