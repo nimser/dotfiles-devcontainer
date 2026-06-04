@@ -52,3 +52,6 @@ helm = "latest"
 {{- end}}
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
+use_versions_host = false # disable using `mise-versions` (https://mise-versions.jdx.dev/) use github api directly instead
+fetch_remote_versions_cache = "2h" # double of default as we get things from github directly
+cache_prune_age = "7d" # default is 30d too long
