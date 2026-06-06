@@ -7,6 +7,7 @@
 
       base = with pkgs; [
         socat
+        python3
         gcc
         tree
         htop
