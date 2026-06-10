@@ -2,6 +2,7 @@
 
 # private files
 .env
+private
 
 # local linting / formating rules
 .oxfmtrc.json
