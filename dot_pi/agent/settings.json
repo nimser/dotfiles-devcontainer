@@ -1,0 +1,12 @@
+{
+  "lastChangelogVersion": "0.79.10",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-4-6",
+  "packages": [
+    "../../.local/share/mise/installs/npm-gotgenes-pi-anthropic-auth/latest/lib/node_modules/@gotgenes/pi-anthropic-auth"
+  ],
+  "theme": "dark",
+  "warnings": {
+    "anthropicExtraUsage": false
+  }
+}
