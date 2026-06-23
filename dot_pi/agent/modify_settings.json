@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+# chezmoi modify_ script: merges managed keys into pi's settings.json,
+# leaving all other keys (e.g. lastChangelogVersion) untouched.
+import json, sys
+
+current = json.load(sys.stdin) if sys.stdin.readable() else {}
+
+managed = {
+    "packages": [
+        "../../.local/share/mise/installs/npm-gotgenes-pi-anthropic-auth/latest/lib/node_modules/@gotgenes/pi-anthropic-auth"
+    ],
+    "warnings": {
+        "anthropicExtraUsage": False
+    },
+}
+
+current.update(managed)
+print(json.dumps(current, indent=2))
