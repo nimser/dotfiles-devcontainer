@@ -26,6 +26,8 @@ fi
 
 if command -v chezmoi &>/dev/null; then
   echo "🏠 Applying chezmoi configuration..."
+  # Ensure mise shims and nix profile are on PATH so modify scripts can find their interpreters
+  export PATH="$HOME/.local/share/mise/shims:$HOME/.nix-profile/bin:$PATH"
   chezmoi apply || {
     errors+=("chezmoi apply failed — run 'chezmoi apply' manually to retry")
   }
