@@ -4,6 +4,48 @@ set -uo pipefail
 
 errors=()
 
+# Run nix-env but keep the console output compact.
+# - Raw nix fetch/build logs are swallowed (kept in a logfile for diagnostics).
+# - On a TTY: a single status line is refreshed with the current package.
+# - Otherwise (e.g. `devpod up` logs): one concise line per package.
+# - Always ends with a ✅/❌ summary.
+install_nix_packages() {
+  local log sep sb="" rc fetched built
+  log=$(mktemp "${TMPDIR:-/tmp}/nix-install.XXXXXX.log")
+  if [ -t 1 ]; then sep='\r\033[K'; else sep='\n'; fi
+  command -v stdbuf > /dev/null 2>&1 && sb="stdbuf -oL -eL"
+
+  $sb nix-env -f "$HOME/.config/nixpkgs/install.nix" -iA myPackages --impure 2>&1 \
+    | tee "$log" \
+    | while IFS= read -r line; do
+        case "$line" in
+          *"copying path '/nix/store/"*)
+            n=${line#*store/}; n=${n%%\'*}; n=${n#*-}
+            printf "${sep}  \xe2\xac\x87  %-48.48s" "$n"
+            ;;
+          *"building '/nix/store/"*)
+            n=${line#*store/}; n=${n%%.drv*}; n=${n#*-}
+            printf "${sep}  \xf0\x9f\x94\xa8 %-48.48s" "$n"
+            ;;
+        esac
+      done
+  rc=${PIPESTATUS[0]}
+
+  fetched=$(grep -c "copying path '/nix/store/" "$log" 2> /dev/null || echo 0)
+  built=$(grep -c "building '/nix/store/" "$log" 2> /dev/null || echo 0)
+
+  if [ "$rc" -eq 0 ]; then
+    printf "${sep}  \xe2\x9c\x85 Nix packages installed (%s fetched, %s built)\n" "$fetched" "$built"
+    rm -f "$log"
+  else
+    printf "${sep}  \xe2\x9d\x8c Nix install failed (%s fetched, %s built before error)\n" "$fetched" "$built"
+    grep -iE "error:|failed" "$log" | sed 's/^/       /' | tail -15
+    echo "       Full log kept at: $log"
+    errors+=("nix-env install failed — see $log or run 'nix-env -f ~/.config/nixpkgs/install.nix -iA myPackages --impure' manually")
+  fi
+  return "$rc"
+}
+
 LOCAL_BIN="$HOME/.local/bin"
 GPGID=0x03BC4AD253B82986
 mkdir -p $LOCAL_BIN
@@ -67,10 +109,8 @@ if command -v nix-env &>/dev/null; then
     # Set system type if not provided via cli
     export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
     export NIX_REMOTE=""
-    # Install all packages defined in install.nix
-    if ! nix-env -f $HOME/.config/nixpkgs/install.nix -iA myPackages --impure 2>&1; then
-      errors+=("nix-env install failed — run 'nix-env -f ~/.config/nixpkgs/install.nix -iA myPackages --impure' manually")
-    fi
+    # Install all packages defined in install.nix (compact, filtered output)
+    install_nix_packages || true
   else
     echo "💥 WARNING: Nix configuration file not found"
     echo "Ensure chezmoi has run and deployed it correctly."
