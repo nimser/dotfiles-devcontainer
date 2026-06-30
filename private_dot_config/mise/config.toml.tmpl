@@ -32,6 +32,7 @@ sops = "latest"
 #gcloud = "latest"
 yq = "latest"
 jq = "1.8.1"
+"aqua:nushell/nushell" = "latest"
 {{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")))}} 
 # only for tpad itself, excluding containers running on it
 "github:yt-dlp/yt-dlp" = "latest"
