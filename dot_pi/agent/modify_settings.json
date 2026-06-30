@@ -1,42 +1,23 @@
-#!/usr/bin/env nu
-# chezmoi modify_ script: merges managed keys into pi's settings.json,
-# leaving all other keys (e.g. lastChangelogVersion) untouched.
-
-let current = if ($in | str length) > 0 { $in | from json } else { {} }
-
-let managed = {
-    defaultProvider: "anthropic"
-    defaultModel: "claude-sonnet-4-6"
-    packages: [
-        "../../.local/share/mise/installs/npm-gotgenes-pi-anthropic-auth/latest/lib/node_modules/@gotgenes/pi-anthropic-auth"
-    ]
-    warnings: {
-        anthropicExtraUsage: false
-    }
-    # Model list shown by default (Ctrl+P cycling / /model picker).
-    #
-    # Why anthropic models are listed explicitly instead of "anthropic/*":
-    # pi's glob matcher tests both `provider/id` AND the bare `id`. OpenRouter
-    # anthropic models have bare ids like "anthropic/claude-opus-4.8", so the
-    # glob "anthropic/*" also pulls in every OpenRouter anthropic model.
-    # Worse, "anthropic/claude-fable-5" is identical as an Anthropic-provider
-    # fullId and an OpenRouter bare id, so no glob can separate them. Exact
-    # `anthropic/<id>` references use canonical provider/id matching and stay
-    # scoped to the Anthropic subscription. Re-run `pi --list-models` after
-    # upgrading pi and append any new Anthropic-provider models here.
-    enabledModels: [
+# chezmoi:modify-template
+{{- $current := dict -}}
+{{- if .chezmoi.stdin -}}
+{{- $current = .chezmoi.stdin | fromJson -}}
+{{- end -}}
+{{- $managed := dict
+    "defaultProvider" "anthropic"
+    "defaultModel"    "claude-sonnet-4-6"
+    "packages"        (list "../../.local/share/mise/installs/npm-gotgenes-pi-anthropic-auth/latest/lib/node_modules/@gotgenes/pi-anthropic-auth")
+    "warnings"        (dict "anthropicExtraUsage" false)
+    "enabledModels"   (list
         "opencode-go/*"
-        # Anthropic subscription (all models, exact refs to avoid OpenRouter bleed)
         "anthropic/claude-fable-5"
         "anthropic/claude-haiku-4-5"
         "anthropic/claude-opus-4-8"
         "anthropic/claude-sonnet-4-5"
         "anthropic/claude-sonnet-4-6"
-        # OpenRouter (only these three)
         "openrouter/anthropic/claude-opus-4.8"
         "openrouter/z-ai/glm-5.2"
         "openrouter/openai/gpt-5.5"
-    ]
-}
-
-$current | merge $managed | to json --indent 2
+    )
+-}}
+{{- mergeOverwrite $current $managed | toPrettyJson }}
