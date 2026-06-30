@@ -14,13 +14,13 @@ if [ -d "$LOCAL_BIN" ] && [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
 fi
 
 # Setup gpg
-if ! gpg --receive-keys $GPGID; then
+if ! gpg --receive-keys $GPGID 2>&1; then
   errors+=("GPG key retrieval failed — run 'gpg --receive-keys $GPGID' manually")
 fi
 
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
-  if sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted; then
+  if sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted 2>&1; then
     echo "🥁 Only non-encrypted files where applied. Please run 'chezmoi apply --include=encrypted' if needed."
   else
     errors+=("chezmoi init/apply failed — install chezmoi manually or check network connection")
@@ -55,7 +55,7 @@ fi
 
 if ! command -v nix-env &>/dev/null && [ ! -d "/nix" ]; then
   echo "🥁 nix-env command not found. Attempting to install Nix..."
-  if sh <(curl -L https://nixos.org/nix/install) --daemon --yes; then
+  if sh <(curl -L https://nixos.org/nix/install) --daemon --yes 2>&1; then
     if [ -f /etc/profile.d/nix.sh ]; then source /etc/profile.d/nix.sh; fi
   else
     errors+=("Nix installation failed — reinstall shell or source /etc/profile.d/nix.sh")
@@ -68,7 +68,7 @@ if command -v nix-env &>/dev/null; then
     export SYSTEM_TYPE=${SYSTEM_TYPE:-server}
     export NIX_REMOTE=""
     # Install all packages defined in install.nix
-    if ! nix-env -f $HOME/.config/nixpkgs/install.nix -iA myPackages --impure; then
+    if ! nix-env -f $HOME/.config/nixpkgs/install.nix -iA myPackages --impure 2>&1; then
       errors+=("nix-env install failed — run 'nix-env -f ~/.config/nixpkgs/install.nix -iA myPackages --impure' manually")
     fi
   else

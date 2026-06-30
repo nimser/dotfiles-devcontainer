@@ -14,12 +14,12 @@ fi
 
 if [ -n "$mise_cmd" ]; then
   echo "🔧 Running mise trust..."
-  $mise_cmd trust || {
+  $mise_cmd trust 2>&1 || {
     errors+=("mise trust failed — tool configurations may not be trusted. Run: mise trust")
   }
 
   echo "🔧 Running mise install..."
-  $mise_cmd install || {
+  $mise_cmd install 2>&1 || {
     errors+=("mise install had errors — run 'mise install' to retry, or 'mise ls' to check tool status")
   }
 fi
@@ -28,7 +28,7 @@ if command -v chezmoi &>/dev/null; then
   echo "🏠 Applying chezmoi configuration..."
   # Ensure mise shims and nix profile are on PATH so modify scripts can find their interpreters
   export PATH="$HOME/.local/share/mise/shims:$HOME/.nix-profile/bin:$PATH"
-  chezmoi apply || {
+  chezmoi apply 2>&1 || {
     errors+=("chezmoi apply failed — run 'chezmoi apply' manually to retry")
   }
 fi
