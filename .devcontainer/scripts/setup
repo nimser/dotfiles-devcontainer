@@ -12,16 +12,66 @@ if command -v mise &>/dev/null; then
   mise_cmd=$(command -v mise)
 fi
 
+# Run mise install with compact output.
+# - Raw multi-step download/verify/extract lines are suppressed (kept in a logfile).
+# - On a TTY: single line refreshed with the current tool being installed.
+# - Otherwise: one "✅ tool@version" line per tool, only on completion.
+# - Errors always surface immediately.
+run_mise_install() {
+  local log sep rc installed_count
+  log=$(mktemp "${TMPDIR:-/tmp}/mise-install.XXXXXX.log")
+  if [ -t 1 ]; then sep='\r\033[K'; else sep=''; fi
+
+  $mise_cmd install 2>&1 \
+    | tee "$log" \
+    | while IFS= read -r line; do
+        case "$line" in
+          # First step of a new tool — show it as in-progress on TTY
+          *"[1/"*)
+            if [ -t 1 ]; then
+              tool=${line#mise }; tool=${tool%%[[:space:]]*}
+              printf '\r\033[K  \xf0\x9f\x94\xa7 %-52.52s' "$tool"
+            fi
+            ;;
+          # Successful completion
+          *'✓ installed'*)
+            tool=${line#mise }; tool=${tool%%[[:space:]]*}
+            printf "${sep}  \xe2\x9c\x85 %s\n" "$tool"
+            ;;
+          # Error / failure
+          *'error'*|*'✗'*)
+            printf "${sep}  \xe2\x9d\x8c %s\n" "$line"
+            ;;
+        esac
+      done
+  rc=${PIPESTATUS[0]}
+
+  installed_count=$(grep -c '✓ installed' "$log" 2>/dev/null || echo 0)
+
+  if [ "$rc" -eq 0 ]; then
+    [ -t 1 ] && printf '\r\033[K'
+    if [ "$installed_count" -gt 0 ]; then
+      echo "  ✅ mise: $installed_count tool(s) installed"
+    else
+      echo "  ✅ mise: all tools already up to date"
+    fi
+    rm -f "$log"
+  else
+    [ -t 1 ] && printf '\r\033[K'
+    echo "  ❌ mise install failed — full log at: $log"
+    grep -iE 'error|✗' "$log" | sed 's/^/       /' | tail -15
+    errors+=("mise install had errors — see $log or run 'mise install' to retry")
+  fi
+  return "$rc"
+}
+
 if [ -n "$mise_cmd" ]; then
-  echo "🔧 Running mise trust..."
-  $mise_cmd trust 2>&1 || {
+  $mise_cmd trust --quiet 2>/dev/null || $mise_cmd trust 2>&1 | grep -iv 'no untrusted' || {
     errors+=("mise trust failed — tool configurations may not be trusted. Run: mise trust")
   }
 
-  echo "🔧 Running mise install..."
-  $mise_cmd install 2>&1 || {
-    errors+=("mise install had errors — run 'mise install' to retry, or 'mise ls' to check tool status")
-  }
+  echo "🔧 mise install..."
+  run_mise_install || true
 fi
 
 if command -v chezmoi &>/dev/null; then
