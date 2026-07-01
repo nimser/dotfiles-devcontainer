@@ -21,7 +21,11 @@ set -g focus-events on
 
 # pass CSI-u / kitty keyboard protocol sequences from the outer terminal (e.g. alacritty)
 # to programs running inside panes (e.g. pi uses Shift+Enter = \u001b[13;2u for newlines)
-set -g extended-keys always
+#
+# Use `on` (not `always`): `always` forces ALL keys through CSI-u encoding, which
+# converts Home/End to \e[72;1u/\e[70;1u — codepoints pi doesn't map to Home/End.
+# `on` only encodes keys that lack an existing representation, preserving Home/End.
+set -g extended-keys on
 set -g extended-keys-format csi-u
 
 # mouse: click panes, scroll, drag splitters, pick windows on the status bar
