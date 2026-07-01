@@ -18,6 +18,7 @@
         brave
         rofi
         xdotool
+        xclip
       ];
       server = with pkgs; [
         wakeonlan
