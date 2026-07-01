@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 {{- if and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")) }}
+# cpu-watchdog.service hash: {{ include "private_dot_config/systemd/user/cpu-watchdog.service" | sha256sum }}
 # docker-cleanup.timer hash: {{ include "private_dot_config/systemd/user/docker-cleanup.timer" | sha256sum }}
 # docker-cleanup.service hash: {{ include "private_dot_config/systemd/user/docker-cleanup.service" | sha256sum }}
 # zettelkasten-inotify.service hash: {{ include "private_dot_config/systemd/user/encrypted_zettelkasten-inotify.service.age" | sha256sum }}
@@ -15,6 +16,7 @@ set -euo pipefail
 systemctl --user daemon-reload
 
 # Enable the units so they start on boot
+systemctl --user enable cpu-watchdog.service
 systemctl --user enable docker-cleanup.timer
 systemctl --user enable zettelkasten-inotify.service
 systemctl --user enable rclone-backup.timer
@@ -24,6 +26,7 @@ systemctl --user enable age-plugin-yubikey-bridge-identity.service
 systemctl --user enable age-plugin-yubikey-bridge-recipient.service
 
 # Restart them to pick up any changes (and start them if they weren't running)
+systemctl --user restart cpu-watchdog.service
 systemctl --user restart docker-cleanup.timer
 systemctl --user restart zettelkasten-inotify.service
 systemctl --user restart rclone-backup.timer
