@@ -95,22 +95,48 @@ Attempted to extend flags pipeline to `google-chrome-stable` (nix). Blocked by:
 - `private_dot_config/tmux/tmux.conf.tmpl`: basic config, Catppuccin Macchiato, default-shell=fish
 - `private_dot_config/i3/config`: Mod+Return → `alacritty -e tmux new-session -A -s main`
 
-**Known issues (next session):**
+**Known issues — RESOLVED:**
 
-1. Rofi dialog not floating (i3 rule added but not taking effect)
-2. Rofi stealing focus (added `no_focus` directive, needs testing)
+1. ~~Rofi dialog not floating~~ ✅ Fixed
+2. ~~Rofi stealing focus~~ ✅ Fixed (same root cause as #1)
 
-**Debug commands:**
+**Root cause (found via rofi source inspection, `xcb/view.c`):** rofi
+hardcodes its own `WM_CLASS` to `instance=rofi, class=Rofi` and its window
+title to `"rofi"` / `"rofi - <mode display name>"` (e.g. `"rofi - dmenu"`).
+There is **no** command-line flag to override this in current rofi — the
+`-name cpu-alert` flag used in `cpu-watchdog`'s `show_dialog()` doesn't
+exist (absent from `rofi.1` manpage and source `rofi.c`/`xrmoptions.c`)
+and was being silently ignored. Consequently the i3 criteria
+`[class="Rofi" title="cpu-alert"]` never matched anything (title is never
+`"cpu-alert"`), so **neither** the `floating enable` rule nor the
+`no_focus` rule ever fired — same bug, two symptoms.
+
+**Fix applied:**
+
+- `private_dot_config/i3/config`: dropped the bogus `title="cpu-alert"`
+  criterion, matching on `[class="Rofi"]` alone for the `bindsym
+  $mod+Mod1+r … focus`, `for_window … floating enable, border none`, and
+  `no_focus` rules. Safe because rofi is invoked *only* for cpu-alert in
+  this config (app launching uses `dmenu_run`, not rofi).
+- `private_dot_local/bin/executable_cpu-watchdog`: removed the dead
+  `-name cpu-alert` flag from the `rofi -dmenu` invocation, added a
+  comment explaining why.
+- Committed to chezmoi repo; **not yet verified on the host** (container
+  has no i3/rofi) — run `~/.local/bin/cpu-watchdog --test` on the tpad
+  host after `chezmoi apply` and confirm the dialog appears floating,
+  top-right anchored, and does not steal focus from the active window.
+
+**Debug commands (if still misbehaving):**
 
 ```bash
 # Trigger test dialog
 ~/.local/bin/cpu-watchdog --test
 
-# Check rofi window properties
+# Check rofi window properties (class/instance/title)
 xprop | grep -E 'WM_CLASS|WM_NAME|_NET_WM_WINDOW_TYPE'
 
-# Verify i3 rules
-i3-msg -t get_tree | jq -r 'recurse(.nodes[]) | select(.name=="rofi") | .floating'
+# Verify i3 rules matched — check floating flag
+i3-msg -t get_tree | jq -r 'recurse(.nodes[]) | select(.window_properties.class=="Rofi") | .floating'
 ```
 
 ---
