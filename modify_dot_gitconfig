@@ -15,7 +15,7 @@ preserved=$(echo "$current" | awk '
 # Write our managed template
 cat << 'MANAGED'
 [core]
-  pager = delta
+  pager = delta --width=200
   editor = nvim
   excludesFile = ~/.gitignore.everywhere
 [gpg]
@@ -59,7 +59,6 @@ cat << 'MANAGED'
   side-by-side = true
   hunk-header-style = syntax
   wrap-max-lines = 0
-  width = 200
   pager = less -FRSX
 [delta "decorations"]
   commit-decoration-style = bold yellow box ul
