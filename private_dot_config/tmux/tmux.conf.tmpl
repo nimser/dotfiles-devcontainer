@@ -1,43 +1,98 @@
+# ──────────────────────────────────────────────────────────────────────
+# tmux config  —  managed by chezmoi (source: private_dot_config/tmux/tmux.conf.tmpl)
+# Reload with:  prefix r        Prefix:  C-b
+# ──────────────────────────────────────────────────────────────────────
+
 # default-shell is intentionally NOT set: let tmux spawn the user's login
-# shell (bash), which sources .profile → exec fish. Spawning the mise fish
+# shell (bash), which sources .profile -> exec fish. Spawning the mise fish
 # shim directly as the pane process disturbed tty ownership and made fish
 # fail with `tcsetattr: I/O error`.
 set -g default-command "bash -l"
 
+# 1-based windows & panes; keep numbering tidy after closes
 set -g base-index 1
 set -g pane-base-index 1
 set -g renumber-windows on
-set -g history-limit 50000
+
+# history (60k) + responsiveness (nvim-friendly escape timing)
+set -g history-limit 60000
 set -g escape-time 10
 set -g focus-events on
+
+# mouse: click panes, scroll, drag splitters, pick windows on the status bar
 set -g mouse on
-set -g set-clipboard on
+
+# true-colour / 256-colour so nvim & ncurses look right under tmux
 set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
+set -ag terminal-overrides ",*:Tc"
 
+# copy/clipboard: OSC52 (works in Alacritty & remote tmux clients) — kept on below in copy-mode
+
+# ── key bindings ───────────────────────────────────────────────────────
+# reload config and confirm
+bind r source-file ~/.config/tmux/tmux.conf \; display-message "tmux config reloaded"
+
+# splits — prefix h = stacked (new pane BELOW), prefix v = side-by-side (new pane to the RIGHT)
+# (vim mental model: :split is horizontal/stacked, :vsplit is vertical/side-by-side)
+# `|` and `-` kept as bonus aliases matching the older config.
+bind h split-window -v -c "#{pane_current_path}"
+bind v split-window -h -c "#{pane_current_path}"
 bind | split-window -h -c "#{pane_current_path}"
 bind - split-window -v -c "#{pane_current_path}"
-bind c new-window      -c "#{pane_current_path}"
-bind r source-file ~/.config/tmux/tmux.conf \; display "reloaded"
 
-bind -n M-Left  select-pane -L
-bind -n M-Right select-pane -R
-bind -n M-Up    select-pane -U
-bind -n M-Down  select-pane -D
-bind -n S-Left  previous-window
-bind -n S-Right next-window
+# new windows open in the current directory; shell starts as login bash -> exec fish
+bind c new-window -c "#{pane_current_path}"
 
-# Catppuccin Macchiato
+# pane navigation/resize left at tmux defaults:
+#     prefix arrows = move    prefix Ctrl-arrows = resize    prefix q = flash pane numbers    prefix o = cycle
+
+# ── copy mode (vi keys, arrow-friendly, system clipboard) ─────────────
+setw -g mode-keys vi
+set -g set-clipboard on
+
+bind-key -T copy-mode-vi v   send-keys -X begin-selection
+bind-key -T copy-mode-vi V   send-keys -X select-line
+bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+
+# yank -> xclip on host; set-clipboard above also fires OSC52 as a fallback for remote/headless
+bind-key -T copy-mode-vi y      send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard 2>/dev/null"
+bind-key -T copy-mode-vi Enter  send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard 2>/dev/null"
+bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard 2>/dev/null"
+
+# explicit arrow movement in copy mode (you use arrows, not hjkl)
+bind-key -T copy-mode-vi Up    send-keys -X cursor-up
+bind-key -T copy-mode-vi Down  send-keys -X cursor-down
+bind-key -T copy-mode-vi Left  send-keys -X cursor-left
+bind-key -T copy-mode-vi Right send-keys -X cursor-right
+
+# ── status bar (Catppuccin Macchiato) ───────────────────────────────────
+set -g status on
+set -g status-interval 2
 set -g status-style          "bg=#24273a,fg=#cad3f5"
-set -g status-left-length    30
-set -g status-left           "#[bg=#c6a0f6,fg=#24273a,bold] #{session_name} #[bg=#24273a,fg=#c6a0f6]"
+set -g status-left-length    42
+set -g status-left          "#[bg=#c6a0f6,fg=#24273a,bold] #S #[bg=#24273a,fg=#c6a0f6]#(~/.config/tmux/host-status.sh)"
 set -g status-right-length   60
 set -g status-right          "#[fg=#494d64]#[bg=#494d64,fg=#b8c0e0] %H:%M  %d %b #[bg=#494d64,fg=#1e2030]#[bg=#1e2030,fg=#b8c0e0] #h "
 set -g window-status-format         " #I:#W "
-set -g window-status-current-format "#[bg=#363a4f,fg=#c6a0f6,bold] #I:#W#{?window_zoomed_flag, 󰊓,} "
+set -g window-status-current-format "#[bg=#363a4f,fg=#c6a0f6,bold] #I:#W#{?window_zoomed_flag,  Z,} "
 set -g window-status-style          "fg=#b8c0e0"
 set -g window-status-current-style  "bg=#363a4f,fg=#c6a0f6"
 set -g window-status-separator      ""
 set -g pane-border-style        "fg=#363a4f"
 set -g pane-active-border-style "fg=#c6a0f6"
 set -g message-style            "bg=#363a4f,fg=#f5a97f"
+
+# ── plugins (TPM) ──────────────────────────────────────────────────────
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+
+# tmux-resurrect:  save = prefix C-s     restore = prefix C-r
+# New tmux sessions start blank by default; restore only when you ask (prefix C-r).
+set -g @resurrect-capture-pane-contents 'on'
+set -g @resurrect-strategy-nvim 'session'
+
+# clone TPM on first start if missing, then load plugins
+if-shell "test ! -d ~/.tmux/plugins/tpm" \
+  "run-shell 'git clone --depth 1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm'"
+run '~/.tmux/plugins/tpm/tpm'
