@@ -49,6 +49,13 @@ set -g allow-passthrough all
 # reload config and confirm
 bind r source-file ~/.config/tmux/tmux.conf \; display-message "tmux config reloaded"
 
+# Ctrl+Backspace → ESC+DEL (\x1b\x7f) so pi and other TUIs see alt+backspace
+# Alacritty sends \x08 for Ctrl+Backspace; tmux sees this as C-h (not C-BSpace).
+# Without this binding, tmux passes \x08 through and pi treats it as plain backspace.
+# ESC+DEL is natively handled by pi's TUI editor (tui.editor.deleteWordBackward)
+# and by fish (bound to backward-kill-word in conf.d/keybindings.fish).
+bind-key -T root C-h send-keys -l \033\177
+
 
 # splits — prefix h = stacked (new pane BELOW), prefix v = side-by-side (new pane to the RIGHT)
 # (vim mental model: :split is horizontal/stacked, :vsplit is vertical/side-by-side)
