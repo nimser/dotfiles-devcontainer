@@ -333,7 +333,7 @@ alert, the suggestion is keyed off the one structural distinction that
 actually changes the right first move: is the culprit a browser or not?
 
 - **Browser** (`comm` matches `*brave*|*chrome*|*chromium*`): suggest
-  **`[t] open Task Manager`**. Killing/renicing the browser's *process*
+  **`[t] open Task Manager`**. Killing/renicing the browser's _process_
   is blunt — the real fix is almost always ending one runaway tab/
   extension, and Chromium's own Task Manager is the only place that can
   accurately attribute CPU to a specific tab (see follow-up session 2 —
@@ -348,7 +348,7 @@ actually changes the right first move: is the culprit a browser or not?
   rofi flag + Pango `<b>...</b>` tags, inserted right after the
   info/window rows and before the action list so it's the first thing
   the eye lands on.
-- Enabling `-markup-rows` means *every* row is now parsed as Pango, so
+- Enabling `-markup-rows` means _every_ row is now parsed as Pango, so
   any interpolated text that can contain `&`/`<`/`>` (window titles —
   page titles routinely contain these) had to be escaped first or
   rendering would break. Added a `pango_esc()` helper and routed
@@ -362,7 +362,7 @@ priority if you realize you need it fast again?**
 Key fact: Linux's default `RLIMIT_NICE` lets an unprivileged user
 freely **raise** their own process's niceness (deprioritize, what `[r]`
 does — nice 19) but only lets them **lower it back down to 0** (normal)
-without `CAP_SYS_NICE` — going *negative* (higher-than-normal priority)
+without `CAP_SYS_NICE` — going _negative_ (higher-than-normal priority)
 requires root. So "undo my renice" is always achievable without sudo;
 "give it more than normal priority" is a deliberate `sudo renice -n -5
 -p <pid>` call and deliberately out of scope for a quick-fire tool.
@@ -392,6 +392,48 @@ indicate `-markup-rows` isn't taking effect or rofi version mismatch),
 confirm a window title containing `&`/`<`/`>` still renders correctly,
 renice something via `[r]`, then confirm `Mod+Alt+u` (or `cpuw-restore`)
 lists it and restores it to nice 0 on selection.
+
+---
+
+### Follow-up session 5 — stop hedging with "possibly"
+
+**Reported:** the `🪟 possibly: <title> (active tab — may not be the
+culprit)` row is exactly the kind of thing to avoid — either the tool
+knows something and states it, or it doesn't and says nothing/asks the
+user to check elsewhere. No middle-ground hedge language.
+
+**Fix applied (`private_dot_local/bin/executable_cpu-watchdog`):**
+
+- `resolve_culprit()` now only ever populates `win_title` (the value
+  `show_dialog` presents as fact) when it actually is uncontestable
+  fact: exactly one window owned by the process (`nwins == 1`) **and**
+  the owner isn't a tabbed browser. Browsers are excluded even at
+  `nwins == 1` because the *window* being known doesn't mean the
+  *tab* is — a single window's title still only reflects whichever tab
+  is currently visible, which may not be the misbehaving one. Dropped
+  the old "prefer the currently-active window" heuristic entirely — it
+  was itself a disguised guess whenever there was more than one
+  candidate window.
+- Added a shared `is_browser_comm()` helper (was previously a duplicated
+  inline `case` in `show_dialog`) so "what counts as a browser" can't
+  drift between the two functions.
+- `show_dialog`'s `win_row` now only ever states measured facts: for
+  browsers, the window *count* (a fact) plus a pointer to `[t]` Task
+  Manager for the tab-level answer it can't give; for non-browsers, the
+  resolved title when unambiguous, or an honest "can't tell which one"
+  when there's more than one window and no title otherwise. The
+  `$wid` used to fire the Task Manager shortcut is still an arbitrary
+  pick among multiple windows, but that's fine — it's a mechanical
+  target for a keystroke, never something displayed as "the" window.
+- The `[c] Copy details` clipboard string (`full_info`) follows the same
+  rule: title only when it's fact, otherwise (browsers) the known
+  window count instead of a guessed tab.
+
+**Not yet verified on host** — after `chezmoi apply`, confirm: a
+non-browser app with exactly one window still shows its title, a
+browser alert never shows a title/tab guess (only the window count +
+`[t]` pointer), and a non-browser app with multiple windows shows the
+honest "can't tell which one" row instead of picking one.
 
 ---
 
