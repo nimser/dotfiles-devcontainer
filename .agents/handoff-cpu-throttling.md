@@ -44,9 +44,10 @@ Project to solve CPU throttling on a Debian trixie ThinkPad (i5 8250U, Intel UHD
 
 **Note — Google Chrome (nix) abandoned:**
 Attempted to extend flags pipeline to `google-chrome-stable` (nix). Blocked by:
+
 1. nix closure doesn't include host Vulkan ICDs / `libigdgmm.so.12` → `--use-angle=vulkan` fails with `vkCreateInstance: Found no drivers`.
 2. `/etc/fish/conf.d/nix.fish` force-prepends nix to `fish_user_paths` (global scope), making `~/.local/bin` shimming unreliable in fish.
-Fix requires `nixGLIntel google-chrome-stable …`. Deferred — Brave only for now.
+   Fix requires `nixGLIntel google-chrome-stable …`. Deferred — Brave only for now.
 
 **Installed on host (Debian):**
 
