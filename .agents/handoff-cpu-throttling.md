@@ -83,6 +83,7 @@ Attempted to extend flags pipeline to `google-chrome-stable` (nix). Blocked by:
 
 - `private_dot_local/bin/executable_cpu-watchdog` (daemon)
 - `private_dot_local/bin/executable_cpu-alert-copy` (xclip helper)
+- `private_dot_local/bin/executable_cpu-restore` (undo a renice — see follow-up session 4)
 - `private_dot_config/systemd/user/cpu-watchdog.service`
 - `private_dot_config/i3/config` (for_window rules, Mod+Alt+r focus binding)
 - `private_dot_config/nixpkgs/config.nix` (rofi, xdotool, xclip)
@@ -191,8 +192,8 @@ Not implemented — out of scope for now.
 
 **Reported:** (1) auto-copy is dangerous, it clobbers whatever the user
 had on the clipboard at that moment; (2) the shown title looks like the
-currently *focused* window, not necessarily the culprit; (3) the dialog
-still doesn't say *why* it fired — load, temp, or freq.
+currently _focused_ window, not necessarily the culprit; (3) the dialog
+still doesn't say _why_ it fired — load, temp, or freq.
 
 **Fix applied (`private_dot_local/bin/executable_cpu-watchdog`):**
 
@@ -201,14 +202,14 @@ still doesn't say *why* it fired — load, temp, or freq.
    100% explicit via the `[c] Copy details` row/key — the only time
    your clipboard is touched is when you deliberately ask for it.
 2. **Two real bugs found in the window-title resolution:**
-   - There was a "last resort" fallback that showed *whatever window is
-     currently active* when the culprit's own window couldn't be
+   - There was a "last resort" fallback that showed _whatever window is
+     currently active_ when the culprit's own window couldn't be
      resolved — i.e. a window totally unrelated to the culprit process,
      presented as if it were relevant. Removed; an unresolved title is
      now just left blank (with an explicit "no window found" row)
      rather than guessing wrong.
    - Even when correctly resolved, a browser window's title reflects
-     whichever tab is currently *visible*, not necessarily the tab whose
+     whichever tab is currently _visible_, not necessarily the tab whose
      renderer process is actually burning CPU in the background — there
      is no X11-level way to attribute a renderer PID to a specific tab
      (Chromium deliberately doesn't expose per-tab info via argv/process
@@ -221,7 +222,7 @@ still doesn't say *why* it fired — load, temp, or freq.
      Task Manager` action (only shown for brave/chrome/chromium `comm`)
      that sends Chromium's native `Shift+Escape` shortcut to the
      resolved browser window via `xdotool key --window`. This opens the
-     browser's own built-in Task Manager, which *does* show accurate
+     browser's own built-in Task Manager, which _does_ show accurate
      per-tab/extension CPU% — delegating the one thing we structurally
      can't determine from outside the browser to the one tool that can.
      Other DevTools-protocol-based approaches (querying `--remote-
@@ -248,6 +249,149 @@ unless you press `[c]`, the `possibly:`/`no window found`/`multiple
 windows` wording reads sensibly, `[t]` actually raises Brave's Task
 Manager, and the `⚠ triggered by: …` line appears and matches the values
 below it.
+
+---
+
+### Follow-up session 3 — freq-based trigger removed, self-detection bug fixed
+
+**Reported:** a real alert fired with `cause: freq` alone (`load 1.68`,
+`temp 53°C`, `freq 23%`) while the machine was doing essentially
+nothing — and the "culprit" it blamed was `ps` itself at `200%`.
+
+**Root cause #1 — `freq_bad` was fundamentally miscalibrated.**
+`get_freq_pct()` compares live `scaling_cur_freq` against
+`cpuinfo_max_freq`, which on Intel CPUs is the **Turbo Boost ceiling**
+(~3.4 GHz here), not a sustained/normal operating point. Idle or
+light-load clocks on this chip naturally sit around 400–800 MHz — i.e.
+**well under any reasonable percentage of turbo max, all the time,
+regardless of whether anything is wrong.** The check also had no
+correlation with actual demand (it was OR'd independently alongside
+`load_bad`/`temp_bad`), so it could not distinguish "CPU is being held
+back from work it wants to do" (real throttling — power/thermal
+capping under load) from "CPU has nothing to do and is correctly
+clocking down to save power" (normal idle behavior). Given this
+laptop's load average was ~1.7 out of 8 logical CPUs at the time, this
+was almost certainly the latter — a false positive baked into the
+metric's design, not a fluke.
+
+A correct version of this check would require correlating low frequency
+with a real demand signal (e.g. recent CPU busy% from `/proc/stat`
+deltas, not the laggier 1-minute load average) — otherwise "low freq"
+is meaningless on its own. Given the added complexity for a fairly
+niche failure mode (PL1/PL2 power-budget throttling without high temp,
+rare on this hardware), **the decision was to remove it entirely**
+rather than half-fix it.
+
+**Fix applied (`private_dot_local/bin/executable_cpu-watchdog`):**
+
+- Removed `FREQ_RATIO_THRESH`/`CPU_WD_FREQ_RATIO`, `get_freq_pct()`,
+  and every `freq`/`peak_freq` reference from the trigger logic,
+  `show_dialog`, the `--test` path, and log messages. The watchdog now
+  triggers on `load` and `temp` only — both of which are unambiguous
+  ("bad" always means "too high", no idle-state ambiguity).
+- The `[c] Copy details` string, `-mesg` header, and `⚠ triggered by: …`
+  line all updated accordingly (no more `freq NN%` fields).
+
+**Root cause #2 — `resolve_culprit()` could catch itself.** The `ps`
+pipeline that samples "top CPU process" only excluded the watchdog
+script's own `$$`, not the transient `ps`/`awk` processes it was itself
+spawning to do that sampling. A freshly-spawned, very-short-lived
+process can report a wildly inflated `%CPU` (computed as
+`cputime / process_age`, and age was near-zero), so `ps` occasionally
+"caught itself" mid-sample and got blamed as the culprit — exactly what
+produced the bogus `pid … ps 200%` report.
+
+**Fix applied:** rather than a narrow name-blocklist (which only
+covers `ps`/`awk` and would miss any other transient helper), the
+`ps` pipeline in `resolve_culprit()` now also samples `etimes`
+(elapsed process age in seconds) and excludes anything under 2s old:
+`ps -eo pid,ppid,comm,%cpu,etimes ... | awk -v me=$$ '$1 != me && $5 >= 2
+{print $1, $2, $3, $4}'`. A real, sustained culprit will already be
+several seconds old by the time the 2-strike/8s-poll trigger fires, so
+this is safe and strictly more general than blocking specific command
+names. Verified locally: `resolve_culprit` no longer picks up its own
+`ps`/`awk` pipeline.
+
+**Not yet verified on host** — after `chezmoi apply`, confirm
+`cpu-watchdog --test` no longer offers `freq` as a possible cause, and
+that a deliberately-induced high-load scenario (e.g. `yes > /dev/null &`
+x4) still triggers correctly on `load`/`temp` alone.
+
+---
+
+### Follow-up session 4 — per-alert "suggested action" + quick un-renice
+
+**Reported:** the dialog offers a flat menu of equally-weighted actions
+with no steer for what to actually try first; also, once you `[r]`
+renice something to idle, how do you get it back to full speed fast if
+you suddenly need it?
+
+**Design decision — one bold, opinionated suggestion per alert, not a
+per-program table.** Rather than hand-maintaining a growing lookup of
+"if comm == X, suggest Y" for every program that might ever trigger an
+alert, the suggestion is keyed off the one structural distinction that
+actually changes the right first move: is the culprit a browser or not?
+
+- **Browser** (`comm` matches `*brave*|*chrome*|*chromium*`): suggest
+  **`[t] open Task Manager`**. Killing/renicing the browser's *process*
+  is blunt — the real fix is almost always ending one runaway tab/
+  extension, and Chromium's own Task Manager is the only place that can
+  accurately attribute CPU to a specific tab (see follow-up session 2 —
+  renderer PIDs don't expose tab identity at the OS level).
+- **Everything else**: suggest **`[r] renice to idle`** — reversible,
+  doesn't kill/lose work, and immediately stops the process from
+  starving everything else without deciding anything irreversible.
+
+**Fix applied (`private_dot_local/bin/executable_cpu-watchdog`):**
+
+- Added a `suggest_row`, rendered in **bold** via a new `-markup-rows`
+  rofi flag + Pango `<b>...</b>` tags, inserted right after the
+  info/window rows and before the action list so it's the first thing
+  the eye lands on.
+- Enabling `-markup-rows` means *every* row is now parsed as Pango, so
+  any interpolated text that can contain `&`/`<`/`>` (window titles —
+  page titles routinely contain these) had to be escaped first or
+  rendering would break. Added a `pango_esc()` helper and routed
+  `comm`/`ptype`/`win_title` through it before building `info_row` and
+  `win_row`. Raw (unescaped) values are still used everywhere else
+  (logs, clipboard, xdotool calls).
+
+**Follow-up question: how do you easily renice a process back to full
+priority if you realize you need it fast again?**
+
+Key fact: Linux's default `RLIMIT_NICE` lets an unprivileged user
+freely **raise** their own process's niceness (deprioritize, what `[r]`
+does — nice 19) but only lets them **lower it back down to 0** (normal)
+without `CAP_SYS_NICE` — going *negative* (higher-than-normal priority)
+requires root. So "undo my renice" is always achievable without sudo;
+"give it more than normal priority" is a deliberate `sudo renice -n -5
+-p <pid>` call and deliberately out of scope for a quick-fire tool.
+
+**New tool — `private_dot_local/bin/executable_cpu-restore`:**
+
+- Lists the user's currently deprioritized (`nice > 0`) processes via
+  `ps -u $(id -u) -o pid,ni,pcpu,comm`, in the same northeast-anchored
+  rofi dialog style as cpu-watchdog.
+- Selecting one runs `renice -n 0 -p <pid>` (succeeds without sudo per
+  the RLIMIT_NICE behavior above) and undoes the matching `ionice -c 3`
+  (idle I/O) cpu-watchdog's `[r]` also applies, restoring `ionice -c 2
+  -n 4` (best-effort/normal).
+- Shows a plain rofi error dialog (`rofi -e`) if nothing is currently
+  reniced.
+- Bound to `$mod+Mod1+u` in i3 (`private_dot_config/i3/config`) and
+  exposed as the `cpuw-restore` fish abbreviation
+  (`private_dot_config/fish/conf.d/abbrevs.fish`) for the same
+  "instant access" reasoning as the existing `cpuw-*` set.
+- The `[r] Renice` case in `cpu-watchdog` now logs a comment pointing
+  at `cpu-restore`/`Mod+Alt+u` so the escape hatch is discoverable from
+  the code, not just this doc.
+
+**Not yet verified on host** — after `chezmoi apply`: confirm the
+`Suggested: ...` row renders in bold (not literal `<b>` tags — would
+indicate `-markup-rows` isn't taking effect or rofi version mismatch),
+confirm a window title containing `&`/`<`/`>` still renders correctly,
+renice something via `[r]`, then confirm `Mod+Alt+u` (or `cpuw-restore`)
+lists it and restores it to nice 0 on selection.
 
 ---
 
