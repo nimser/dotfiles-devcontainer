@@ -395,6 +395,47 @@ lists it and restores it to nice 0 on selection.
 
 ---
 
+### Follow-up session 6 — `load` alerts firing too often on light usage
+
+**Reported:** alerts fire too often for the `load` criterion when the
+system isn't actually loaded much.
+
+**Root cause.** This laptop has 8 logical CPUs (i5-8250U, 4c/8t), so
+the old `LOAD_THRESH=4.0` default was only 50% utilization — easily
+and routinely reached by ordinary desktop activity (browser + a couple
+of background tasks), not genuine overload. On top of that, load and
+temp shared a single `consecutive` strike counter/`TRIGGER_COUNT=2`
+(16s at the 8s poll interval), even though load is a far noisier/
+spikier signal than temp — a couple of brief load blips alone could
+reach the same short trigger count that was really calibrated for the
+slower-moving temp signal.
+
+**Fix applied (`private_dot_local/bin/executable_cpu-watchdog`):**
+
+- `LOAD_THRESH` default raised `4.0 → 6.0` (~75% of 8 logical CPUs).
+- Strike tracking split into two fully independent streaks/counters
+  (`consecutive_load`/`consecutive_temp`, each with their own peak
+  tracking), instead of one shared counter. Load now requires its own,
+  longer streak: `LOAD_TRIGGER_COUNT` defaults to 4 (32s sustained)
+  via `CPU_WD_LOAD_STRIKES`; temp keeps the original, shorter
+  `TEMP_TRIGGER_COUNT` default of 2 (16s) via `CPU_WD_TEMP_STRIKES`.
+  Both still fall back to the old shared `CPU_WD_STRIKES` env var if
+  set, for backwards compatibility.
+- The dialog still fires as soon as *either* metric completes its own
+  streak — temp-only alerts are unaffected; only load needed to become
+  harder to trigger.
+- Startup/strike log lines updated to show each metric's own
+  threshold/streak progress separately (`load strike N/M`, `temp
+  strike N/M`).
+
+**Not yet verified on host** — after `chezmoi apply`, confirm ordinary
+light usage (idle-ish browsing) no longer fires `cause: load` alerts,
+while a deliberate `yes > /dev/null &` x4+ sustained for ~32s still
+triggers one, and that a genuine temp spike still fires at the
+original 16s cadence.
+
+---
+
 ### Follow-up session 5 — stop hedging with "possibly"
 
 **Reported:** the `🪟 possibly: <title> (active tab — may not be the
@@ -408,8 +449,8 @@ user to check elsewhere. No middle-ground hedge language.
   `show_dialog` presents as fact) when it actually is uncontestable
   fact: exactly one window owned by the process (`nwins == 1`) **and**
   the owner isn't a tabbed browser. Browsers are excluded even at
-  `nwins == 1` because the *window* being known doesn't mean the
-  *tab* is — a single window's title still only reflects whichever tab
+  `nwins == 1` because the _window_ being known doesn't mean the
+  _tab_ is — a single window's title still only reflects whichever tab
   is currently visible, which may not be the misbehaving one. Dropped
   the old "prefer the currently-active window" heuristic entirely — it
   was itself a disguised guess whenever there was more than one
@@ -418,7 +459,7 @@ user to check elsewhere. No middle-ground hedge language.
   inline `case` in `show_dialog`) so "what counts as a browser" can't
   drift between the two functions.
 - `show_dialog`'s `win_row` now only ever states measured facts: for
-  browsers, the window *count* (a fact) plus a pointer to `[t]` Task
+  browsers, the window _count_ (a fact) plus a pointer to `[t]` Task
   Manager for the tab-level answer it can't give; for non-browsers, the
   resolved title when unambiguous, or an honest "can't tell which one"
   when there's more than one window and no title otherwise. The
