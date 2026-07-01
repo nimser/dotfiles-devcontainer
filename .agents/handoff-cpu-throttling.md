@@ -421,7 +421,7 @@ slower-moving temp signal.
   `TEMP_TRIGGER_COUNT` default of 2 (16s) via `CPU_WD_TEMP_STRIKES`.
   Both still fall back to the old shared `CPU_WD_STRIKES` env var if
   set, for backwards compatibility.
-- The dialog still fires as soon as *either* metric completes its own
+- The dialog still fires as soon as _either_ metric completes its own
   streak — temp-only alerts are unaffected; only load needed to become
   harder to trigger.
 - Startup/strike log lines updated to show each metric's own
