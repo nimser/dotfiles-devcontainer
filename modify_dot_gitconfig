@@ -59,6 +59,8 @@ cat << 'MANAGED'
   side-by-side = true
   hunk-header-style = syntax
   wrap-max-lines = 0
+  width = 200
+  pager = less -FRSX
 [delta "decorations"]
   commit-decoration-style = bold yellow box ul
   file-style = bold yellow ul
