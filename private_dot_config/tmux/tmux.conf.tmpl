@@ -32,11 +32,19 @@ set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
 set -ag terminal-overrides ",*:Tc"
 
+# allow passthrough so embedded TUIs (pi, nvim, etc.) can negotiate protocols
+# directly with the outer terminal.  Required for pi's kitty-keyboard query
+# (\x1B[<u) to reach Alacritty, which replies with \x1B[<1u — activating
+# pi's CSI-u parser and making extended keys (Ctrl+Backspace, Shift+Enter)
+# work correctly inside pi.
+set -g allow-passthrough all
+
 # copy/clipboard: OSC52 (works in Alacritty & remote tmux clients) — kept on below in copy-mode
 
 # ── key bindings ───────────────────────────────────────────────────────
 # reload config and confirm
 bind r source-file ~/.config/tmux/tmux.conf \; display-message "tmux config reloaded"
+
 
 # splits — prefix h = stacked (new pane BELOW), prefix v = side-by-side (new pane to the RIGHT)
 # (vim mental model: :split is horizontal/stacked, :vsplit is vertical/side-by-side)
