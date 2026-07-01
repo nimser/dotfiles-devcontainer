@@ -16,6 +16,8 @@
         jellyfin-ffmpeg
         google-chrome
         brave
+        rofi
+        xdotool
       ];
       server = with pkgs; [
         wakeonlan
