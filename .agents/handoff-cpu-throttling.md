@@ -68,30 +68,45 @@ Attempted to extend flags pipeline to `google-chrome-stable` (nix). Blocked by:
 
 ## Next: Component 1 — CPU Watchdog Daemon
 
-### Architecture (from original plan)
+### Status: ✅ Mostly Complete (2 known issues)
 
-- **Detection:** Poll every 8s: load > 4.0 / temp > 88°C / freq-ratio < 65% for 2 consecutive polls
-- **Process resolver:** X-window-title → cmdline heuristics → parent-walk → comm
-- **Actions:** Kill / Force-Kill / Renice-to-idle / Run-on-@mbp / Open-htop / Snooze
-- **Service:** systemd user unit, import DISPLAY/XAUTHORITY in i3
+**Implemented:**
+- Polling daemon with load/temp/freq thresholds (8s interval, 2-strike trigger)
+- Rofi dialog with single-key actions (k=kill, f=force-kill, r=renice, h=htop, s=snooze, d=dismiss)
+- Process resolver: xdotool parent-walk to find window title
+- tmux-aware terminal launcher (opens htop in tmux if available)
+- Fish integration: `cpustat` function + `cpuw-{start,stop,log,st,test}` abbreviations
+- Systemd user service with bash -lc wrapper for PATH
 
-### Open Decisions (need user input)
+**Files:**
+- `private_dot_local/bin/executable_cpu-watchdog` (daemon)
+- `private_dot_local/bin/executable_cpu-alert-copy` (xclip helper)
+- `private_dot_config/systemd/user/cpu-watchdog.service`
+- `private_dot_config/i3/config` (for_window rules, Mod+Alt+r focus binding)
+- `private_dot_config/nixpkgs/config.nix` (rofi, xdotool, xclip)
+- `private_dot_config/fish/functions/cpustat.fish`
+- `private_dot_config/fish/conf.d/abbrevs.fish` (cpuw-* abbrs)
 
-1. **rofi vs yad** for the popup dialog
-   - rofi: keyboard-only, type-to-filter, matches i3/dmenu muscle memory
-   - yad: more dialog-like, Alt+letter mnemonics
+**Related infra:**
+- `dot_bashrc`: removed `exec fish` (broke bash scripts)
+- `private_dot_config/tmux/tmux.conf.tmpl`: basic config, Catppuccin Macchiato, default-shell=fish
+- `private_dot_config/i3/config`: Mod+Return → `alacritty -e tmux new-session -A -s main`
 
-2. **tmux** for "run on @mbp" terminal rebinding
-   - tmux: true same-pane reuse via `tmux send-keys`
-   - No tmux: spawn fresh alacritty window with reconstructed command
+**Known issues (next session):**
+1. Rofi dialog not floating (i3 rule added but not taking effect)
+2. Rofi stealing focus (added `no_focus` directive, needs testing)
 
-### Files to create
+**Debug commands:**
+```bash
+# Trigger test dialog
+~/.local/bin/cpu-watchdog --test
 
-- `private_dot_local/bin/executable_cpu-watchdog` — main daemon
-- `private_dot_config/systemd/user/cpu-watchdog.service` — systemd unit
-- Update `run_onchange_after_enable-systemd-units.sh.tmpl` — add cpu-watchdog
-- Update `private_dot_config/i3/config` — add `import-environment DISPLAY XAUTHORITY`
-- Add fish abbrs: `cpustat` for quick load/temp/freq check
+# Check rofi window properties
+xprop | grep -E 'WM_CLASS|WM_NAME|_NET_WM_WINDOW_TYPE'
+
+# Verify i3 rules
+i3-msg -t get_tree | jq -r 'recurse(.nodes[]) | select(.name=="rofi") | .floating'
+```
 
 ---
 

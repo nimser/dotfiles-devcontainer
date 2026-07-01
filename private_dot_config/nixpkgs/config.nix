@@ -16,9 +16,6 @@
         jellyfin-ffmpeg
         google-chrome
         brave
-        rofi
-        xdotool
-        xclip
       ];
       server = with pkgs; [
         wakeonlan
@@ -29,6 +26,10 @@
         mermaid-cli
         imagemagick
         scrcpy
+        tmux
+        xdotool
+        rofi
+        xclip
       ];
     in {
       myPackages = pkgs.buildEnv {
