@@ -1,7 +1,8 @@
-{{ $fishShim := joinPath .chezmoi.homeDir ".local/share/mise/shims/fish" }}
-{{ if stat $fishShim }}set-option -g default-shell "{{ $fishShim }}"
-{{ end }}# default-shell: only set when the mise fish shim exists; otherwise let the
-# login shell fall through .profile (which execs fish when a tty is attached).
+# default-shell is intentionally NOT set: let tmux spawn the user's login
+# shell (bash), which sources .profile → exec fish. Spawning the mise fish
+# shim directly as the pane process disturbed tty ownership and made fish
+# fail with `tcsetattr: I/O error`.
+set -g default-command "bash -l"
 
 set -g base-index 1
 set -g pane-base-index 1
