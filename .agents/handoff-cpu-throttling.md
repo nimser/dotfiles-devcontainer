@@ -116,7 +116,7 @@ and was being silently ignored. Consequently the i3 criteria
 - `private_dot_config/i3/config`: dropped the bogus `title="cpu-alert"`
   criterion, matching on `[class="Rofi"]` alone for the `bindsym
   $mod+Mod1+r … focus`, `for_window … floating enable, border none`, and
-  `no_focus` rules. Safe because rofi is invoked *only* for cpu-alert in
+  `no_focus` rules. Safe because rofi is invoked _only_ for cpu-alert in
   this config (app launching uses `dmenu_run`, not rofi).
 - `private_dot_local/bin/executable_cpu-watchdog`: removed the dead
   `-name cpu-alert` flag from the `rofi -dmenu` invocation, added a
@@ -138,6 +138,57 @@ xprop | grep -E 'WM_CLASS|WM_NAME|_NET_WM_WINDOW_TYPE'
 # Verify i3 rules matched — check floating flag
 i3-msg -t get_tree | jq -r 'recurse(.nodes[]) | select(.window_properties.class=="Rofi") | .floating'
 ```
+
+---
+
+### Follow-up session — clipboard copy + tab identification
+
+**Reported:** (1) can't select rofi dialog content with the mouse, (2)
+alert just said "brave" without saying which tab/page was the culprit.
+
+**Root cause (found via rofi source, `helper.c`/`view.c`):** the
+`-on-selection-changed 'cpu-alert-copy "{}"'` hook — clearly added
+previously as a workaround for rofi's lack of mouse text-selection in
+dmenu mode — used the wrong placeholder token. Rofi substitutes
+`{entry}`, not `{}`; the literal string `"{}"` was never replaced, so
+the "copy to clipboard" safety net was silently copying the two
+characters `{}` on every keypress, never the actual row content. On top
+of that, the diagnostic info (window title, process name) only ever
+lived in `-mesg`, a static label that was never wired to the copy hook
+anyway (and isn't mouse-selectable either). For the "which tab" question:
+Chromium/Brave renderer subprocesses don't own X11 windows and don't
+expose tab titles/URLs via argv (privacy sandboxing) — the previous
+implementation had no way to say more than the owning browser *window's*
+title (which reflects the active tab, not necessarily the runaway
+background one), and said nothing at all when that resolution failed.
+
+**Fix applied (`private_dot_local/bin/executable_cpu-watchdog`):**
+
+- Fixed the placeholder: `-on-selection-changed 'cpu-alert-copy "{entry}"'`
+- `resolve_culprit()` now parses the offending process's `--type=` flag
+  (e.g. `renderer`, `gpu-process`, `utility`) to label *what kind* of
+  Chromium subprocess is misbehaving, alongside its `comm`
+- Diagnostic info moved out of the static `-mesg` header into real,
+  selectable dmenu rows (`info_row`, plus `win_row` for the window title
+  or an explicit "🫥 no window found — likely a background tab" note when
+  resolution fails) — row 0 is pre-selected when the dialog opens, so
+  it's auto-copied to PRIMARY+CLIPBOARD with **no keypress needed**
+- Added an explicit `[c] Copy details` action (kb-custom-5, `c` key) that
+  copies a fuller diagnostic string (pid, comm, type, %cpu, window title,
+  cmdline) built from real variables, then re-opens the dialog so the
+  user can still pick kill/renice/etc. afterwards
+- `-mesg` now only shows the quick-glance load/temp/freq metrics
+
+**Still a known limitation:** true per-tab identification (exact page
+title/URL of the runaway renderer, vs. just the owning window/whichever
+tab happens to be visible) would require the DevTools protocol or
+chrome://process-internals, not just process/window introspection.
+Not implemented — out of scope for now.
+
+**Not yet verified on host** — after `chezmoi apply`, run
+`~/.local/bin/cpu-watchdog --test`, confirm: dialog opens with the info
+row already in your clipboard (try pasting immediately), the emoji rows
+render fine in the rofi font, and `[c] Copy details` works.
 
 ---
 
