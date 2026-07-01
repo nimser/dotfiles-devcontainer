@@ -158,7 +158,7 @@ lived in `-mesg`, a static label that was never wired to the copy hook
 anyway (and isn't mouse-selectable either). For the "which tab" question:
 Chromium/Brave renderer subprocesses don't own X11 windows and don't
 expose tab titles/URLs via argv (privacy sandboxing) — the previous
-implementation had no way to say more than the owning browser *window's*
+implementation had no way to say more than the owning browser _window's_
 title (which reflects the active tab, not necessarily the runaway
 background one), and said nothing at all when that resolution failed.
 
@@ -166,7 +166,7 @@ background one), and said nothing at all when that resolution failed.
 
 - Fixed the placeholder: `-on-selection-changed 'cpu-alert-copy "{entry}"'`
 - `resolve_culprit()` now parses the offending process's `--type=` flag
-  (e.g. `renderer`, `gpu-process`, `utility`) to label *what kind* of
+  (e.g. `renderer`, `gpu-process`, `utility`) to label _what kind_ of
   Chromium subprocess is misbehaving, alongside its `comm`
 - Diagnostic info moved out of the static `-mesg` header into real,
   selectable dmenu rows (`info_row`, plus `win_row` for the window title
@@ -185,10 +185,69 @@ tab happens to be visible) would require the DevTools protocol or
 chrome://process-internals, not just process/window introspection.
 Not implemented — out of scope for now.
 
+---
+
+### Follow-up session 2 — feedback on the above fix
+
+**Reported:** (1) auto-copy is dangerous, it clobbers whatever the user
+had on the clipboard at that moment; (2) the shown title looks like the
+currently *focused* window, not necessarily the culprit; (3) the dialog
+still doesn't say *why* it fired — load, temp, or freq.
+
+**Fix applied (`private_dot_local/bin/executable_cpu-watchdog`):**
+
+1. **Removed `-on-selection-changed` entirely.** No more automatic
+   clipboard writes on open or arrow-key navigation. Copying is now
+   100% explicit via the `[c] Copy details` row/key — the only time
+   your clipboard is touched is when you deliberately ask for it.
+2. **Two real bugs found in the window-title resolution:**
+   - There was a "last resort" fallback that showed *whatever window is
+     currently active* when the culprit's own window couldn't be
+     resolved — i.e. a window totally unrelated to the culprit process,
+     presented as if it were relevant. Removed; an unresolved title is
+     now just left blank (with an explicit "no window found" row)
+     rather than guessing wrong.
+   - Even when correctly resolved, a browser window's title reflects
+     whichever tab is currently *visible*, not necessarily the tab whose
+     renderer process is actually burning CPU in the background — there
+     is no X11-level way to attribute a renderer PID to a specific tab
+     (Chromium deliberately doesn't expose per-tab info via argv/process
+     introspection, for privacy/site-isolation reasons). The title is
+     now explicitly labeled `possibly: <title> (active tab — may not be
+     the culprit)`, and a `🪟×N multiple windows open` row appears when
+     the owning process has more than one window (further reducing
+     confidence in the guess).
+   - **New approach instead of guessing:** added a `[t] Open browser
+     Task Manager` action (only shown for brave/chrome/chromium `comm`)
+     that sends Chromium's native `Shift+Escape` shortcut to the
+     resolved browser window via `xdotool key --window`. This opens the
+     browser's own built-in Task Manager, which *does* show accurate
+     per-tab/extension CPU% — delegating the one thing we structurally
+     can't determine from outside the browser to the one tool that can.
+     Other DevTools-protocol-based approaches (querying `--remote-
+     debugging-port`, `chrome://process-internals`) were considered but
+     rejected: they'd require enabling a debugging port permanently
+     (security/attack-surface tradeoff) for a rarely-used diagnostic.
+3. **Trigger cause was being silently lost.** `show_dialog` previously
+   re-sampled load/temp/freq itself when building the dialog, instead of
+   using the values that actually caused the 2-strike trigger in the
+   polling loop. `freq` in particular is extremely volatile under DVFS
+   and can bounce back to normal within milliseconds — so by the time
+   the dialog re-sampled it, the "!" marker could vanish entirely, making
+   the alert look like it fired for no reason. Fix: the main loop now
+   tracks the **peak/worst** load, temp, and freq observed across the
+   whole strike streak (`peak_load`/`peak_temp`/`peak_freq`, reset
+   whenever the streak breaks) and passes those into `show_dialog`
+   instead of re-sampling. The dialog's first line now explicitly reads
+   `⚠ triggered by: load, freq` (etc.) so the cause is unambiguous, in
+   addition to the existing `!`-suffixed metric markers.
+
 **Not yet verified on host** — after `chezmoi apply`, run
-`~/.local/bin/cpu-watchdog --test`, confirm: dialog opens with the info
-row already in your clipboard (try pasting immediately), the emoji rows
-render fine in the rofi font, and `[c] Copy details` works.
+`~/.local/bin/cpu-watchdog --test` and confirm: clipboard is untouched
+unless you press `[c]`, the `possibly:`/`no window found`/`multiple
+windows` wording reads sensibly, `[t]` actually raises Brave's Task
+Manager, and the `⚠ triggered by: …` line appears and matches the values
+below it.
 
 ---
 
