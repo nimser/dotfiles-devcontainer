@@ -58,6 +58,7 @@ cat << 'MANAGED'
   syntax-theme = tokyonight_moon
   side-by-side = true
   hunk-header-style = syntax
+  wrap-max-lines = 0
 [delta "decorations"]
   commit-decoration-style = bold yellow box ul
   file-style = bold yellow ul
