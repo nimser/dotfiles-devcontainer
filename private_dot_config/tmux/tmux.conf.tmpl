@@ -22,6 +22,7 @@ set -g focus-events on
 # pass CSI-u / kitty keyboard protocol sequences from the outer terminal (e.g. alacritty)
 # to programs running inside panes (e.g. pi uses Shift+Enter = \u001b[13;2u for newlines)
 set -g extended-keys always
+set -g extended-keys-format csi-u
 
 # mouse: click panes, scroll, drag splitters, pick windows on the status bar
 set -g mouse on
