@@ -19,6 +19,10 @@ set -g history-limit 60000
 set -g escape-time 10
 set -g focus-events on
 
+# pass CSI-u / kitty keyboard protocol sequences from the outer terminal (e.g. alacritty)
+# to programs running inside panes (e.g. pi uses Shift+Enter = \u001b[13;2u for newlines)
+set -g extended-keys always
+
 # mouse: click panes, scroll, drag splitters, pick windows on the status bar
 set -g mouse on
 
