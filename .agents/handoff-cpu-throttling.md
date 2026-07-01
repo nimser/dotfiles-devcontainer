@@ -71,6 +71,7 @@ Attempted to extend flags pipeline to `google-chrome-stable` (nix). Blocked by:
 ### Status: ✅ Mostly Complete (2 known issues)
 
 **Implemented:**
+
 - Polling daemon with load/temp/freq thresholds (8s interval, 2-strike trigger)
 - Rofi dialog with single-key actions (k=kill, f=force-kill, r=renice, h=htop, s=snooze, d=dismiss)
 - Process resolver: xdotool parent-walk to find window title
@@ -79,6 +80,7 @@ Attempted to extend flags pipeline to `google-chrome-stable` (nix). Blocked by:
 - Systemd user service with bash -lc wrapper for PATH
 
 **Files:**
+
 - `private_dot_local/bin/executable_cpu-watchdog` (daemon)
 - `private_dot_local/bin/executable_cpu-alert-copy` (xclip helper)
 - `private_dot_config/systemd/user/cpu-watchdog.service`
@@ -88,15 +90,18 @@ Attempted to extend flags pipeline to `google-chrome-stable` (nix). Blocked by:
 - `private_dot_config/fish/conf.d/abbrevs.fish` (cpuw-* abbrs)
 
 **Related infra:**
+
 - `dot_bashrc`: removed `exec fish` (broke bash scripts)
 - `private_dot_config/tmux/tmux.conf.tmpl`: basic config, Catppuccin Macchiato, default-shell=fish
 - `private_dot_config/i3/config`: Mod+Return → `alacritty -e tmux new-session -A -s main`
 
 **Known issues (next session):**
+
 1. Rofi dialog not floating (i3 rule added but not taking effect)
 2. Rofi stealing focus (added `no_focus` directive, needs testing)
 
 **Debug commands:**
+
 ```bash
 # Trigger test dialog
 ~/.local/bin/cpu-watchdog --test
