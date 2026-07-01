@@ -1,0 +1,39 @@
+set-option -g default-shell "{{ .chezmoi.homeDir }}/.local/share/mise/shims/fish"
+
+set -g base-index 1
+set -g pane-base-index 1
+set -g renumber-windows on
+set -g history-limit 50000
+set -g escape-time 10
+set -g focus-events on
+set -g mouse on
+set -g set-clipboard on
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+bind c new-window      -c "#{pane_current_path}"
+bind r source-file ~/.config/tmux/tmux.conf \; display "reloaded"
+
+bind -n M-Left  select-pane -L
+bind -n M-Right select-pane -R
+bind -n M-Up    select-pane -U
+bind -n M-Down  select-pane -D
+bind -n S-Left  previous-window
+bind -n S-Right next-window
+
+# Catppuccin Macchiato
+set -g status-style          "bg=#24273a,fg=#cad3f5"
+set -g status-left-length    30
+set -g status-left           "#[bg=#c6a0f6,fg=#24273a,bold] #{session_name} #[bg=#24273a,fg=#c6a0f6]"
+set -g status-right-length   60
+set -g status-right          "#[fg=#494d64]#[bg=#494d64,fg=#b8c0e0] %H:%M  %d %b #[bg=#494d64,fg=#1e2030]#[bg=#1e2030,fg=#b8c0e0] #h "
+set -g window-status-format         " #I:#W "
+set -g window-status-current-format "#[bg=#363a4f,fg=#c6a0f6,bold] #I:#W#{?window_zoomed_flag, 󰊓,} "
+set -g window-status-style          "fg=#b8c0e0"
+set -g window-status-current-style  "bg=#363a4f,fg=#c6a0f6"
+set -g window-status-separator      ""
+set -g pane-border-style        "fg=#363a4f"
+set -g pane-active-border-style "fg=#c6a0f6"
+set -g message-style            "bg=#363a4f,fg=#f5a97f"
