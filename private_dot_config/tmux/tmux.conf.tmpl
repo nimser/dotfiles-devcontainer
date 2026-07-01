@@ -98,7 +98,7 @@ set -g status on
 set -g status-interval 2
 set -g status-style          "bg=#24273a,fg=#cad3f5"
 set -g status-left-length    42
-set -g status-left          "#[bg=#c6a0f6,fg=#24273a,bold] #S #[bg=#24273a,fg=#c6a0f6]#(~/.config/tmux/host-status.sh)"
+set -g status-left          "#[bg=#c6a0f6,fg=#24273a,bold] #S #[bg=#24273a,fg=#c6a0f6]#(~/.config/tmux/host-status.sh '#{@ssh_remote_host}')"
 set -g status-right-length   60
 set -g status-right          "#[fg=#494d64]#[bg=#494d64,fg=#b8c0e0] %H:%M  %d %b #[bg=#494d64,fg=#1e2030]#[bg=#1e2030,fg=#b8c0e0] #h "
 set -g window-status-format         " #I:#W "

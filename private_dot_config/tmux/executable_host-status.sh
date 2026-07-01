@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # status-left segment for tmux.
-#   - If @ssh_remote_host is set (by the fish `ssh` wrapper when it runs inside tmux on the host),
-#     show it on a subtle, stable per-host colour, so the bar clearly tells you which devpod/host
-#     a pane is SSH'd into.
+#   - $1 is the *current pane's* @ssh_remote_host user option, set by the fish `ssh` wrapper when
+#     it runs inside tmux on the host. tmux.conf passes it in via '#{@ssh_remote_host}' so this
+#     always reflects the pane actually being viewed, not a server-wide flag — otherwise SSH'ing
+#     in one pane would tag every pane/window/session in the whole tmux server, and the tag could
+#     get stuck forever if that pane were ever killed instead of ssh exiting cleanly.
 #   - Otherwise show the local hostname (so the bar always says where tmux itself is running).
 #
 # Per-host colour: a small palette of muted dark tones; the host name is hashed to pick one index,
 # so the same host always gets the same colour, and different hosts differ subtly.
 
-host=$(tmux show-options -gv @ssh_remote_host 2>/dev/null)
+host=$1
 
 if [ -n "$host" ]; then
     # muted Catppuccin Macchiato tints (subtle, never glaring against #24273a)
