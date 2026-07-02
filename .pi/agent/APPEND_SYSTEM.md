@@ -1,1 +1,1 @@
-.agents/skills/concise/SKILL.md
+../../.agents/skills/concise/SKILL.md
