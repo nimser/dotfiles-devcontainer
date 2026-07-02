@@ -67,11 +67,9 @@ if ! command -v chezmoi > /dev/null; then
     echo "🥁 Only non-encrypted files where applied. Please run 'chezmoi apply --include=encrypted' if needed."
     rm -f "$chezmoi_log"
   else
-    # chezmoi init/apply itself usually succeeds even when this reports a
-    # non-zero exit: the failure is typically a post-apply hook (e.g. a
-    # single package failing to install via mise) rather than chezmoi
-    # failing to set up dotfiles. Surface the specific culprit if we can
-    # find one instead of a generic "chezmoi failed" message.
+    # A non-zero exit here is usually a post-apply hook failure (e.g. one
+    # package failing to install via mise), not chezmoi itself. Name the
+    # actual culprit when we can find one, instead of blaming chezmoi.
     failed_tools=$(grep -oP '(?<=Failed to install ).*?(?=: )' "$chezmoi_log" | sort -u)
     if [ -n "$failed_tools" ]; then
       while IFS= read -r tool; do
