@@ -62,10 +62,24 @@ fi
 
 # Install and initialize chezmoi in one go
 if ! command -v chezmoi > /dev/null; then
-  if sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted 2>&1; then
+  chezmoi_log=$(mktemp "${TMPDIR:-/tmp}/chezmoi-init.XXXXXX.log")
+  if sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $LOCAL_BIN init --apply git@github.com:nimser/private-dotfiles-devcontainer.git --exclude=encrypted 2>&1 | tee "$chezmoi_log"; then
     echo "🥁 Only non-encrypted files where applied. Please run 'chezmoi apply --include=encrypted' if needed."
+    rm -f "$chezmoi_log"
   else
-    errors+=("chezmoi init/apply failed — install chezmoi manually or check network connection")
+    # chezmoi init/apply itself usually succeeds even when this reports a
+    # non-zero exit: the failure is typically a post-apply hook (e.g. a
+    # single package failing to install via mise) rather than chezmoi
+    # failing to set up dotfiles. Surface the specific culprit if we can
+    # find one instead of a generic "chezmoi failed" message.
+    failed_tools=$(grep -oP '(?<=Failed to install ).*?(?=: )' "$chezmoi_log" | sort -u)
+    if [ -n "$failed_tools" ]; then
+      while IFS= read -r tool; do
+        errors+=("package install failed: $tool — dotfiles were still applied; see $chezmoi_log or retry with 'mise install'")
+      done <<< "$failed_tools"
+    else
+      errors+=("chezmoi init/apply reported an error — see $chezmoi_log or check network connection")
+    fi
   fi
 fi
 
