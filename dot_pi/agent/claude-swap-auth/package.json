@@ -1,0 +1,15 @@
+{
+  "name": "pi-claude-swap-auth",
+  "version": "0.1.0",
+  "description": "Overlay for @gotgenes/pi-anthropic-auth that sources Anthropic OAuth tokens live from Claude Code's ~/.claude/.credentials.json, making pi compatible with claude-swap account live-swapping.",
+  "type": "module",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": ">=0.80.0",
+    "@earendil-works/pi-coding-agent": ">=0.80.0"
+  }
+}
