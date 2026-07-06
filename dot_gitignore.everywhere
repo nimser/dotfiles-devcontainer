@@ -21,3 +21,6 @@ core.[0-9]*
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# noisy software generated files
+.claude/settings.local.json
