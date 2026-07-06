@@ -6,10 +6,7 @@
 {{- $managed := dict
     "defaultProvider" "anthropic"
     "defaultModel"    "claude-sonnet-5"
-    "packages"        (list
-        "../../.local/share/mise/installs/npm-gotgenes-pi-anthropic-auth/latest/lib/node_modules/@gotgenes/pi-anthropic-auth"
-        "claude-swap-auth"
-    )
+    "packages"        (list "../../.local/share/mise/installs/npm-pi-claude-auth/latest/lib/node_modules/pi-claude-auth/")
     "warnings"        (dict "anthropicExtraUsage" false)
     "enabledModels"   (list
         "opencode-go/*"
