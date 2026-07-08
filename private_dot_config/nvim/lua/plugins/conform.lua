@@ -18,6 +18,11 @@ return {
     },
     default_format_opts = {
       lsp_format = "fallback",
+      -- dprint JIT-compiles its WASM plugins on first use (~6s cold for the full
+      -- global-config set), then caches them (~0.15s warm). The default 1000ms
+      -- timeout aborts that first compile before the cache is written, so every
+      -- save keeps timing out. A generous timeout absorbs the one-time cold compile.
+      timeout_ms = 10000,
     },
     formatters = {
       shfmt = {
