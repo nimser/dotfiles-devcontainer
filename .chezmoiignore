@@ -16,6 +16,23 @@
 .config/gopass/.core-twodots
 .config/gopass/.hil-bg-onedot
 .config/gopass/.hil-bg-twodots
+# Host/GUI/hardware config that has no business inside a container
+.config/alacritty
+.config/i3
+.config/i3status
+.config/psd
+.config/qmk_firmware
+.config/discord
+.config/fcitx5
+.config/rclone
+.config/chromium-flags.conf
+.local/bin/brave-browser
+.local/bin/brave-browser0
+.local/bin/rclone
+.local/bin/rclone-restore
+.local/bin/cpu-watchdog
+.local/bin/cpu-restore
+.local/bin/cpu-alert-copy
 {{- end }}
 {{- if not (stat "/.dockerenv") }}
 # On host outside Docker

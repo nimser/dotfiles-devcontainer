@@ -24,6 +24,12 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/.local/share/chezmoi,type=bind",
   "workspaceFolder": "/home/vscode/.local/share/chezmoi",
   "mounts": [
+    // Persistent caches: named volumes survive `devpod up --recreate` and the
+    // weekly docker-cleanup timer (volume prune only removes anonymous volumes).
+    // They turn nix-env / mise install into near no-ops on rebuild.
+    "source=devpod-nix,target=/nix,type=volume",
+    "source=devpod-mise,target=/home/vscode/.local/share/mise,type=volume",
+    "source=devpod-cache,target=/home/vscode/.cache,type=volume",
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
     "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/mnt/host/git-signing.pub,type=bind,readonly",
     "source=${localEnv:HOME}/.ssh/gopass-deploy-key,target=/mnt/host/gopass-deploy-key,type=bind,readonly",
@@ -60,6 +66,6 @@
       }
     }
   },
-  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local && mkdir -p /home/vscode/.ssh && sudo chown vscode:vscode /home/vscode/.ssh && mkdir -p /home/vscode/.local/state/age-plugin-tpm /home/vscode/.local/state/age-plugin-yubikey && sudo chown -R vscode:vscode /home/vscode/.pi && sudo chown -R vscode:vscode /home/vscode/.claude",
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local /home/vscode/.cache && mkdir -p /home/vscode/.ssh && sudo chown vscode:vscode /home/vscode/.ssh && mkdir -p /home/vscode/.local/state/age-plugin-tpm /home/vscode/.local/state/age-plugin-yubikey && sudo chown -R vscode:vscode /home/vscode/.pi && sudo chown -R vscode:vscode /home/vscode/.claude",
   "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup"
 }

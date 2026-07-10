@@ -23,6 +23,9 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/.local/share/chezmoi,type=bind",
   "workspaceFolder": "/home/vscode/.local/share/chezmoi",
   "mounts": [
+    "source=devpod-nix,target=/nix,type=volume",
+    "source=devpod-mise,target=/home/vscode/.local/share/mise,type=volume",
+    "source=devpod-cache,target=/home/vscode/.cache,type=volume",
     "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/mnt/host/git-signing.pub,type=bind,readonly",
     "source=${localEnv:HOME}/.local/share/opencode,target=/home/vscode/.local/share/opencode,type=bind"
   ],
@@ -52,7 +55,7 @@
       }
     }
   },
-  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local",
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local /home/vscode/.cache",
   "updateContentCommand": "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 && wget -qO - https://xpra.org/gpg.asc | sudo gpg --dearmor -o /usr/share/keyrings/xpra.gpg && . /etc/os-release && echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/xpra.gpg] https://xpra.org/ $VERSION_CODENAME main\" | sudo tee /etc/apt/sources.list.d/xpra.list && sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xpra xvfb",
   "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup",
   "postStartCommand": "mkdir -p /tmp/xpra-runtime && env XDG_RUNTIME_DIR=/tmp/xpra-runtime xpra start :100 --bind-tcp=0.0.0.0:10000 --daemon=yes --mdns=no --auth=none"
