@@ -15,6 +15,9 @@ install_nix_packages() {
   if [ -t 1 ]; then sep='\r\033[K'; else sep='\n'; fi
   command -v stdbuf > /dev/null 2>&1 && sb="stdbuf -oL -eL"
 
+  # tarball-ttl: trust the cached nixpkgs channel tarball for a week instead of
+  # the 1h default, so a persistent ~/.cache spares the ~50s fetchTarball+eval
+  NIX_CONFIG="tarball-ttl = 604800" \
   $sb nix-env -f "$HOME/.config/nixpkgs/install.nix" -iA myPackages --impure 2>&1 \
     | tee "$log" \
     | while IFS= read -r line; do
@@ -55,9 +58,22 @@ if [ -d "$LOCAL_BIN" ] && [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
   PATH="${PATH:+"$PATH:"}$LOCAL_BIN"
 fi
 
-# Setup gpg
-if ! gpg --receive-keys $GPGID 2>&1; then
-  errors+=("GPG key retrieval failed — run 'gpg --receive-keys $GPGID' manually")
+# Setup gpg. Import the public key from the repo copy when available: a fresh
+# keyring's `gpg --receive-keys` was measured at 2+ minutes (dirmngr keyserver
+# connect timeouts) while a local import is instant and offline.
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd)
+PUBKEY_FILE="${SCRIPT_DIR:-.}/.devcontainer/gpg-pubkey.asc"
+if gpg --list-keys "$GPGID" > /dev/null 2>&1; then
+  : # already in the keyring
+elif [ -f "$PUBKEY_FILE" ]; then
+  if ! gpg --import "$PUBKEY_FILE" 2>&1; then
+    errors+=("GPG key import from $PUBKEY_FILE failed — run 'gpg --receive-keys $GPGID' manually")
+  fi
+else
+  # Fallback: keyserver fetch, but capped so it can't stall setup for minutes
+  if ! timeout 60 gpg --keyserver hkps://keyserver.ubuntu.com:443 --receive-keys "$GPGID" 2>&1; then
+    errors+=("GPG key retrieval failed — run 'gpg --receive-keys $GPGID' manually")
+  fi
 fi
 
 # Install and initialize chezmoi in one go
