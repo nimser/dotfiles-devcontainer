@@ -44,9 +44,9 @@
   ],
   "runArgs": [
     "--net=host",
+    "--ipc=host",
     "--cap-add=SYS_ADMIN",
-    "--security-opt=seccomp=unconfined",
-    "--ipc=host"
+    "--security-opt=seccomp=unconfined"
   ],
   "customizations": {
     "vscode": {
