@@ -9,7 +9,6 @@
     "packages"        (list "../../.local/share/mise/installs/npm-pi-claude-auth/latest/lib/node_modules/pi-claude-auth/")
     "warnings"        (dict "anthropicExtraUsage" false)
     "enabledModels"   (list
-        "opencode-go/*"
         "anthropic/claude-fable-5"
         "anthropic/claude-haiku-4-5"
         "anthropic/claude-opus-4-8"
