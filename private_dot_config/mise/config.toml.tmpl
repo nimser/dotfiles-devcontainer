@@ -23,7 +23,11 @@ node = "latest"
 uv = "latest"
 viteplus = "latest"
 "github:sst/opencode" = "latest"
-pi = "0.80.3"
+# github backend, not the aqua default: aqua-registry lags upstream releases for
+# pi (stale/missing checksums right after a release), which broke `mise upgrade`
+# more than once. github: installs straight from the GH release + verifies
+# artifact attestation/SLSA provenance, so `latest` is safe to track again.
+"github:earendil-works/pi" = "latest"
 claude = "latest"
 "pipx:realiti4/claude-swap" = "latest"
 "npm:pi-claude-auth" = "latest"
