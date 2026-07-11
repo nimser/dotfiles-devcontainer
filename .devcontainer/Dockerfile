@@ -10,12 +10,10 @@ RUN curl -fsSL https://mise.run \
     | MISE_VERSION=${MISE_VERSION} MISE_INSTALL_PATH=/usr/local/bin/mise MISE_QUIET=1 sh \
     && mise --version
 
-# Pre-create named-volume mountpoints owned by vscode. When Docker seeds a
-# fresh named volume (devpod-cache / devpod-mise) it copies ownership from
-# the image path; without this the mountpoint is created root:root and every
-# cache write (chezmoi, nix, mise) fails with 'permission denied'.
-# Also bake in the static dirs that used to be mkdir'd in onCreateCommand:
-# .ssh (devpod key injection) and the age-plugin bridge state dirs.
+# Named volumes (devpod-cache, devpod-mise) inherit ownership from the image
+# path they mount over; a missing path is created root:root and every cache
+# write fails. Pre-create them owned by vscode, along with ~/.ssh (devpod key
+# injection) and the age-plugin bridge state dirs.
 RUN mkdir -p /home/vscode/.cache /home/vscode/.local/share/mise \
       /home/vscode/.ssh \
       /home/vscode/.local/state/age-plugin-tpm \

@@ -71,9 +71,9 @@
       }
     }
   },
-  // First line of defense only — static dirs are baked into the Dockerfile
-  // and `setup` self-heals ownership. `;` (not &&) so one failure can't
-  // silently skip the rest.
+  // Best-effort early chown of volume mountpoints and bind mounts. The
+  // Dockerfile seeds volume ownership and `setup` self-heals, so this is
+  // deliberately non-fatal (`;` + `|| true`).
   "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.cache /home/vscode/.local /home/vscode/.local/share/mise || true; sudo chown -R vscode:vscode /home/vscode/.pi /home/vscode/.claude || true",
   "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup"
 }
