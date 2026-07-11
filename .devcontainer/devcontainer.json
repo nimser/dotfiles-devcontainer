@@ -71,6 +71,9 @@
       }
     }
   },
-  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local /home/vscode/.cache && mkdir -p /home/vscode/.ssh && sudo chown vscode:vscode /home/vscode/.ssh && mkdir -p /home/vscode/.local/state/age-plugin-tpm /home/vscode/.local/state/age-plugin-yubikey && sudo chown -R vscode:vscode /home/vscode/.pi && sudo chown -R vscode:vscode /home/vscode/.claude",
+  // First line of defense only — static dirs are baked into the Dockerfile
+  // and `setup` self-heals ownership. `;` (not &&) so one failure can't
+  // silently skip the rest.
+  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.cache /home/vscode/.local /home/vscode/.local/share/mise || true; sudo chown -R vscode:vscode /home/vscode/.pi /home/vscode/.claude || true",
   "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup"
 }

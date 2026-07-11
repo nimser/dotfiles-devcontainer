@@ -62,7 +62,8 @@
       }
     }
   },
-  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local /home/vscode/.cache",
+  // First line of defense only — Dockerfile seeds ownership, `setup` self-heals.
+  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.cache /home/vscode/.local /home/vscode/.local/share/mise || true",
   "updateContentCommand": "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 && wget -qO - https://xpra.org/gpg.asc | sudo gpg --dearmor -o /usr/share/keyrings/xpra.gpg && . /etc/os-release && echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/xpra.gpg] https://xpra.org/ $VERSION_CODENAME main\" | sudo tee /etc/apt/sources.list.d/xpra.list && sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xpra xvfb",
   "postCreateCommand": ".devcontainer/scripts/setup && bash /home/vscode/.local/share/chezmoi/setup",
   "postStartCommand": "mkdir -p /tmp/xpra-runtime && env XDG_RUNTIME_DIR=/tmp/xpra-runtime xpra start :100 --bind-tcp=0.0.0.0:10000 --daemon=yes --mdns=no --auth=none"

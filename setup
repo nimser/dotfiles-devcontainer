@@ -65,6 +65,18 @@ for d in "$HOME/.cache" "$HOME/.local" "$HOME/.local/share/mise"; do
   fi
 done
 
+# Bind mounts (~/.pi, ~/.claude) can be root-owned too when Docker auto-created
+# the source dir on the host. Don't mkdir these — only heal them if mounted.
+for d in "$HOME/.pi" "$HOME/.claude"; do
+  if [ -d "$d" ] && [ ! -w "$d" ]; then
+    if sudo -n chown -R "$(id -u):$(id -g)" "$d" 2>/dev/null; then
+      echo "🔧 fixed ownership of $d"
+    else
+      errors+=("$d is not writable and could not be chowned — run 'sudo chown -R $(id -un) $d'")
+    fi
+  fi
+done
+
 LOCAL_BIN="$HOME/.local/bin"
 GPGID=0x03BC4AD253B82986
 mkdir -p $LOCAL_BIN
