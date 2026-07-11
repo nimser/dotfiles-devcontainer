@@ -49,14 +49,14 @@ install_nix_packages() {
   return "$rc"
 }
 
-# Self-heal ownership of named-volume mountpoints. Docker creates fresh
-# volume mountpoints root:root when the path doesn't exist in the image, and
-# this script can run before (or instead of) the devcontainer onCreateCommand
-# chown — leaving ~/.cache & co unwritable and breaking chezmoi/nix/mise.
+# Named-volume mountpoints may be root:root (volume predates the image's
+# ownership seeding, or onCreateCommand didn't run). Chown them back before
+# chezmoi/nix/mise try to write.
 for d in "$HOME/.cache" "$HOME/.local" "$HOME/.local/share/mise"; do
   mkdir -p "$d" 2>/dev/null
   if [ ! -w "$d" ]; then
-    rflag="-R"; [ "$d" = "$HOME/.local" ] && rflag="" # skip bind-mounted workspace under .local
+    # ~/.local contains the bind-mounted workspace: don't chown host files
+    rflag="-R"; [ "$d" = "$HOME/.local" ] && rflag=""
     if sudo -n chown $rflag "$(id -u):$(id -g)" "$d" 2>/dev/null; then
       echo "🔧 fixed ownership of $d"
     else
@@ -65,8 +65,8 @@ for d in "$HOME/.cache" "$HOME/.local" "$HOME/.local/share/mise"; do
   fi
 done
 
-# Bind mounts (~/.pi, ~/.claude) can be root-owned too when Docker auto-created
-# the source dir on the host. Don't mkdir these — only heal them if mounted.
+# ~/.pi and ~/.claude are bind mounts; Docker creates a missing host-side
+# source dir root-owned. Heal only when actually mounted — never mkdir.
 for d in "$HOME/.pi" "$HOME/.claude"; do
   if [ -d "$d" ] && [ ! -w "$d" ]; then
     if sudo -n chown -R "$(id -u):$(id -g)" "$d" 2>/dev/null; then
