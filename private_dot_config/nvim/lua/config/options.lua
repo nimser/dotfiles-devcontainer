@@ -38,6 +38,11 @@ opt.signcolumn = "yes:1" -- always show signcolumns
 opt.title = true         -- Allows neovim to send the Terminal details of the current window, instead of just getting 'v'
 opt.whichwrap = "[,]"
 opt.wrap = true
+-- Nicer diffs (nvim -d): histogram anchors hunks on unique lines for cleaner
+-- boundaries; linematch re-aligns similar lines inside hunks (≤60 lines) for
+-- side-by-side pairing and char-level highlights. Cosmetic only — dp/do unchanged.
+opt.diffopt:remove("linematch:40") -- LazyVim default; replaced by the 60-line cap below
+opt.diffopt:append({ "linematch:60", "algorithm:histogram" })
 
 -- global settings for diagnostics
 vim.diagnostic.config({
