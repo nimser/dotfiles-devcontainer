@@ -49,6 +49,22 @@ install_nix_packages() {
   return "$rc"
 }
 
+# Self-heal ownership of named-volume mountpoints. Docker creates fresh
+# volume mountpoints root:root when the path doesn't exist in the image, and
+# this script can run before (or instead of) the devcontainer onCreateCommand
+# chown — leaving ~/.cache & co unwritable and breaking chezmoi/nix/mise.
+for d in "$HOME/.cache" "$HOME/.local" "$HOME/.local/share/mise"; do
+  mkdir -p "$d" 2>/dev/null
+  if [ ! -w "$d" ]; then
+    rflag="-R"; [ "$d" = "$HOME/.local" ] && rflag="" # skip bind-mounted workspace under .local
+    if sudo -n chown $rflag "$(id -u):$(id -g)" "$d" 2>/dev/null; then
+      echo "🔧 fixed ownership of $d"
+    else
+      errors+=("$d is not writable and could not be chowned — run 'sudo chown -R $(id -un) $d'")
+    fi
+  fi
+done
+
 LOCAL_BIN="$HOME/.local/bin"
 GPGID=0x03BC4AD253B82986
 mkdir -p $LOCAL_BIN
