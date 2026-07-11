@@ -24,9 +24,14 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/.local/share/chezmoi,type=bind",
   "workspaceFolder": "/home/vscode/.local/share/chezmoi",
   "mounts": [
-    // Persistent caches: named volumes survive `devpod up --recreate` and the
-    // weekly docker-cleanup timer (volume prune only removes anonymous volumes).
-    // They turn nix-env / mise install into near no-ops on rebuild.
+    // Persistent caches. A *named* volume (source=<name>,type=volume) is a
+    // Docker object with its own lifecycle: containers only attach to it, so
+    // `--recreate` (docker rm + run) and the weekly cleanup leave it intact
+    // (`docker volume prune` only removes *anonymous* volumes). On first mount
+    // over a non-empty image path (/nix), Docker seeds the empty volume from
+    // the image; afterwards the volume always wins over image content. Net
+    // effect: nix-env / mise install are near no-ops on rebuild. To re-seed
+    // after a nix feature upgrade: `docker volume rm devpod-nix`.
     "source=devpod-nix,target=/nix,type=volume",
     "source=devpod-mise,target=/home/vscode/.local/share/mise,type=volume",
     "source=devpod-cache,target=/home/vscode/.cache,type=volume",
