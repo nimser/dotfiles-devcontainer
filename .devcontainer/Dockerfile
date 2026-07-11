@@ -21,8 +21,15 @@ RUN mkdir -p /home/vscode/.cache /home/vscode/.local/share/mise \
     chown -R vscode:vscode /home/vscode/.cache /home/vscode/.local /home/vscode/.ssh && \
     chmod 700 /home/vscode/.ssh
 
-# install x11-utils and make sure mise is activated in both zsh and bash.
-RUN apt-get -y update && apt-get install -y --no-install-recommends x11-utils && \
+# Single apt update/install/cleanup, then activate mise in zsh and bash.
+RUN apt-get -y update && apt-get install -y --no-install-recommends \
+        x11-utils \
+        fonts-liberation \
+        fonts-noto-core \
+        fontconfig && \
     rm -rf /var/lib/apt/lists/* && \
+    fc-cache -fv && \
     echo 'eval "$(mise activate bash)"' >> /home/vscode/.bashrc && \
     echo 'eval "$(mise activate zsh)"' >> /home/vscode/.zshrc
+
+CMD ["fc-list"]
