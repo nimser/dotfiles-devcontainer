@@ -20,13 +20,17 @@ if [ ! -d "$STORES_DIR/bg/.git" ]; then
     TMP_SSH_DIR=$(mktemp -d)
     GIT_SSH_COMMAND="ssh -i ~/.ssh/gopass-deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5 -o UserKnownHostsFile=$TMP_SSH_DIR/known_hosts" git clone git@gitlab.com:nimser/coffre-fort-bg.git "$STORES_DIR/bg"
 fi
+{{- end }}
 
 # Persist deploy-key transport for all subsequent git ops in the bg store
 # (gopass sync / cli.autopush from agent or CLI), bypassing the SSH agent
 # and thus any YubiKey touch prompt. IdentitiesOnly=yes prevents agent keys
 # from being offered; commit signing still uses the agent as usual.
-if [ -d "$STORES_DIR/bg/.git" ]; then
-    git -C "$STORES_DIR/bg" config core.sshCommand \
+# Guarded on key presence: remote containers don't mount the deploy key,
+# and pointing ssh at a missing key with BatchMode would hard-fail pushes
+# instead of falling back to the agent.
+BG_STORE="$HOME/.local/share/gopass/stores/bg"
+if [ -d "$BG_STORE/.git" ] && [ -f "$HOME/.ssh/gopass-deploy-key" ]; then
+    git -C "$BG_STORE" config core.sshCommand \
         'ssh -i ~/.ssh/gopass-deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5'
 fi
-{{- end }}
