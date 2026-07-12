@@ -33,4 +33,8 @@ BG_STORE="$HOME/.local/share/gopass/stores/bg"
 if [ -d "$BG_STORE/.git" ] && [ -f "$HOME/.ssh/gopass-deploy-key" ]; then
     git -C "$BG_STORE" config core.sshCommand \
         'ssh -i ~/.ssh/gopass-deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5'
+    # Normalize legacy ssh-config alias remotes (e.g. git@gitlab-bg:...) to the
+    # real host: the alias lived in ~/.ssh/config which chezmoi now rebuilds
+    # without it, and core.sshCommand makes the alias redundant anyway.
+    git -C "$BG_STORE" remote set-url origin git@gitlab.com:nimser/coffre-fort-bg.git
 fi
