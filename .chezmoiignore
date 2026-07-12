@@ -2,6 +2,10 @@
 # In Docker containers (regardless of hostname)
 .devpod/**
 .ssh/config
+# DevPod owns ~/.docker/config.json (credsStore: devpod) inside containers;
+# our gopassbg credsStore is host-only (GHCR push workflow), so don't fight
+# DevPod's own credential injection in here.
+.docker/config.json
 .gnupg/gpg-agent.conf
 .gnupg/gpg.conf
 .config/nvim/lazyvim.json
