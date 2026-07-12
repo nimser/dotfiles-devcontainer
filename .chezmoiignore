@@ -1,3 +1,6 @@
+{{- if (ne (env "DEVPOD_WORKSPACE_ID") "homelab")}}
+.talos/**
+{{- end }}
 {{- if stat "/.dockerenv" }}
 # In Docker containers (regardless of hostname)
 .devpod/**
