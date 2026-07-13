@@ -1,0 +1,18 @@
+# Minimal image used only to pre-warm the devpod-mise / devpod-cache Docker
+# volumes in the background (see devpod-mise-warm.timer). Deliberately does
+# NOT reuse .devcontainer/Dockerfile: no x11/fonts/nix, just enough to run
+# `mise install` against the same tool set the real devcontainer uses.
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
+
+# Keep in sync with the ARG in .devcontainer/Dockerfile.
+ARG MISE_VERSION=v2026.7.5
+RUN curl -fsSL https://mise.run \
+      | MISE_VERSION=${MISE_VERSION} MISE_INSTALL_PATH=/usr/local/bin/mise MISE_QUIET=1 sh \
+    && mise --version \
+    && sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
+
+RUN mkdir -p /home/vscode/.cache /home/vscode/.local/share/mise && \
+    chown -R vscode:vscode /home/vscode/.cache /home/vscode/.local
+
+USER vscode
+WORKDIR /home/vscode

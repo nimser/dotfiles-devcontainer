@@ -40,6 +40,7 @@
 .local/bin/cpu-watchdog
 .local/bin/cpu-restore
 .local/bin/cpu-alert-copy
+.local/bin/devpod-mise-warm
 {{- end }}
 {{- if not (stat "/.dockerenv") }}
 # On host outside Docker
