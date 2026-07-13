@@ -66,8 +66,3 @@ minimum_release_age = "1h" # don't install something younger that this age
 use_versions_host = false # disable using `mise-versions` (https://mise-versions.jdx.dev/) use github api directly instead
 fetch_remote_versions_cache = "1h" # default
 cache_prune_age = "7d" # default is 30d too long
-[settings.gitlab]
-# don't silently reuse the glab CLI token (~/.config/glab-cli/config.yml): a
-# stale/expired glab token turns public API calls into 401s and makes
-# `mise install` retry/fail. Re-enable after `glab auth login` if needed.
-glab_cli_tokens = false
