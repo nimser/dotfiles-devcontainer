@@ -2,6 +2,7 @@
 type = "file"
 executable = true
 url = "https://mise.jdx.dev/mise-latest-{{.chezmoi.os}}-{{.chezmoi.arch}}"
-# re-download at most weekly; avoids needing `--refresh-externals` (which
-# forces a full re-download of every external on each apply)
-refreshPeriod = "168h"
+# No refreshPeriod: interactive `chezmoi apply` should never stall on this
+# 94 MB download. chezmoi-refresh-externals.timer (systemd user unit) runs
+# `chezmoi apply --include=externals --refresh-externals=always` weekly in
+# the background instead.

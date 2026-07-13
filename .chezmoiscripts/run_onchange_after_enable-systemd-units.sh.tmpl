@@ -12,6 +12,8 @@
 # age-plugin-yubikey-bridge-recipient.service hash: {{ include "private_dot_config/systemd/user/age-plugin-yubikey-bridge-recipient.service" | sha256sum }}
 # claude-swap.service hash: {{ include "private_dot_config/systemd/user/claude-swap.service" | sha256sum }}
 # claude-swap.timer hash: {{ include "private_dot_config/systemd/user/claude-swap.timer" | sha256sum }}
+# chezmoi-refresh-externals.service hash: {{ include "private_dot_config/systemd/user/chezmoi-refresh-externals.service" | sha256sum }}
+# chezmoi-refresh-externals.timer hash: {{ include "private_dot_config/systemd/user/chezmoi-refresh-externals.timer" | sha256sum }}
 
 set -euo pipefail
 
@@ -27,6 +29,7 @@ systemctl --user enable age-plugin-tpm-bridge-recipient.service
 systemctl --user enable age-plugin-yubikey-bridge-identity.service
 systemctl --user enable age-plugin-yubikey-bridge-recipient.service
 systemctl --user enable claude-swap.timer
+systemctl --user enable chezmoi-refresh-externals.timer
 
 # Restart them to pick up any changes (and start them if they weren't running)
 systemctl --user restart cpu-watchdog.service
@@ -38,4 +41,5 @@ systemctl --user restart age-plugin-tpm-bridge-recipient.service
 systemctl --user restart age-plugin-yubikey-bridge-identity.service
 systemctl --user restart age-plugin-yubikey-bridge-recipient.service
 systemctl --user restart claude-swap.timer
+systemctl --user restart chezmoi-refresh-externals.timer
 {{- end }}
