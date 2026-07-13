@@ -2,3 +2,6 @@
 type = "file"
 executable = true
 url = "https://mise.jdx.dev/mise-latest-{{.chezmoi.os}}-{{.chezmoi.arch}}"
+# re-download at most weekly; avoids needing `--refresh-externals` (which
+# forces a full re-download of every external on each apply)
+refreshPeriod = "168h"
