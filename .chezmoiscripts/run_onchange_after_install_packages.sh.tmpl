@@ -5,7 +5,12 @@ set -euo pipefail
 
 mise_cmd=$(which mise)
 if command -v $mise_cmd >/dev/null; then
-  $mise_cmd trust && $mise_cmd install
+  $mise_cmd trust
+  # mise hides progress when output is piped (as chezmoi does); a cold
+  # version cache means ~30-60s of silent GitHub API resolution for all
+  # the `latest` tools. Print something so it doesn't look hung.
+  echo ">> mise install: resolving latest versions (can take ~1min)..."
+  $mise_cmd install
 fi
 if command -v tldr >/dev/null; then
   tldr --update
