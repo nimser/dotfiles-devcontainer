@@ -14,6 +14,10 @@
 # claude-swap.timer hash: {{ include "private_dot_config/systemd/user/claude-swap.timer" | sha256sum }}
 # chezmoi-refresh-externals.service hash: {{ include "private_dot_config/systemd/user/chezmoi-refresh-externals.service" | sha256sum }}
 # chezmoi-refresh-externals.timer hash: {{ include "private_dot_config/systemd/user/chezmoi-refresh-externals.timer" | sha256sum }}
+# devpod-mise-warm.service hash: {{ include "private_dot_config/systemd/user/devpod-mise-warm.service" | sha256sum }}
+# devpod-mise-warm.timer hash: {{ include "private_dot_config/systemd/user/devpod-mise-warm.timer" | sha256sum }}
+# devpod-mise-warm script hash: {{ include "private_dot_local/bin/executable_devpod-mise-warm" | sha256sum }}
+# Dockerfile.mise-warm hash: {{ include ".devcontainer/Dockerfile.mise-warm" | sha256sum }}
 
 set -euo pipefail
 
@@ -30,6 +34,7 @@ systemctl --user enable age-plugin-yubikey-bridge-identity.service
 systemctl --user enable age-plugin-yubikey-bridge-recipient.service
 systemctl --user enable claude-swap.timer
 systemctl --user enable chezmoi-refresh-externals.timer
+systemctl --user enable devpod-mise-warm.timer
 
 # Restart them to pick up any changes (and start them if they weren't running)
 systemctl --user restart cpu-watchdog.service
@@ -42,4 +47,5 @@ systemctl --user restart age-plugin-yubikey-bridge-identity.service
 systemctl --user restart age-plugin-yubikey-bridge-recipient.service
 systemctl --user restart claude-swap.timer
 systemctl --user restart chezmoi-refresh-externals.timer
+systemctl --user restart devpod-mise-warm.timer
 {{- end }}
