@@ -33,7 +33,7 @@
     "source=devpod-nix,target=/nix,type=volume",
     "source=devpod-mise,target=/home/vscode/.local/share/mise,type=volume",
     "source=devpod-cache,target=/home/vscode/.cache,type=volume",
-    "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/mnt/host/git-signing.pub,type=bind,readonly",
+    "source=${localEnv:HOME}/.ssh/container-shared,target=/mnt/host/container-shared,type=bind,readonly",
     "source=${localEnv:HOME}/.local/share/opencode,target=/home/vscode/.local/share/opencode,type=bind"
   ],
   "runArgs": [

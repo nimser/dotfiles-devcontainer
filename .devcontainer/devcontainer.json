@@ -36,7 +36,7 @@
     "source=devpod-mise,target=/home/vscode/.local/share/mise,type=volume",
     "source=devpod-cache,target=/home/vscode/.cache,type=volume",
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-    "source=${localEnv:HOME}/.ssh/git-signing.pub,target=/mnt/host/git-signing.pub,type=bind,readonly",
+    "source=${localEnv:HOME}/.ssh/container-shared,target=/mnt/host/container-shared,type=bind,readonly",
     "source=${localEnv:HOME}/.ssh/gopass-deploy-key,target=/mnt/host/gopass-deploy-key,type=bind,readonly",
     "source=${localEnv:HOME}/skills,target=/home/vscode/skills,type=bind",
     "source=${localEnv:HOME}/.pi,target=/home/vscode/.pi,type=bind",
