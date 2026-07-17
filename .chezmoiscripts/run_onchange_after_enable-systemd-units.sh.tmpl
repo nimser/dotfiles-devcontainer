@@ -17,6 +17,9 @@
 # devpod-mise-warm.service hash: {{ include "private_dot_config/systemd/user/devpod-mise-warm.service" | sha256sum }}
 # devpod-mise-warm.timer hash: {{ include "private_dot_config/systemd/user/devpod-mise-warm.timer" | sha256sum }}
 # devpod-mise-warm script hash: {{ include "private_dot_local/bin/executable_devpod-mise-warm" | sha256sum }}
+# ssh-agent.service hash: {{ include "private_dot_config/systemd/user/ssh-agent.service" | sha256sum }}
+# yubikey-signing-rebind.service hash: {{ include "private_dot_config/systemd/user/yubikey-signing-rebind.service" | sha256sum }}
+# yubikey-signing-rebind script hash: {{ include "private_dot_local/bin/executable_yubikey-signing-rebind" | sha256sum }}
 # Dockerfile.mise-warm hash: {{ include ".devcontainer/Dockerfile.mise-warm" | sha256sum }}
 
 set -euo pipefail
@@ -35,6 +38,8 @@ systemctl --user enable age-plugin-yubikey-bridge-recipient.service
 systemctl --user enable claude-swap.timer
 systemctl --user enable chezmoi-refresh-externals.timer
 systemctl --user enable devpod-mise-warm.timer
+systemctl --user enable ssh-agent.service
+# yubikey-signing-rebind.service: not enabled — activated by udev (SYSTEMD_USER_WANTS)
 
 # Restart them to pick up any changes (and start them if they weren't running)
 systemctl --user restart cpu-watchdog.service
@@ -48,4 +53,5 @@ systemctl --user restart age-plugin-yubikey-bridge-recipient.service
 systemctl --user restart claude-swap.timer
 systemctl --user restart chezmoi-refresh-externals.timer
 systemctl --user restart devpod-mise-warm.timer
+systemctl --user restart ssh-agent.service
 {{- end }}

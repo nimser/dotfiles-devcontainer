@@ -1,0 +1,16 @@
+#!/usr/bin/bash
+{{- if and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")) }}
+set -euo pipefail
+
+# Insertion of any Yubico device (vendor 1050) pulls in the user-manager
+# rebind unit. TAG+="systemd" is required for the device to reach service
+# managers; SYSTEMD_USER_WANTS targets the *user* instance (systemd.device(5)).
+rule='ACTION=="add", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}+="yubikey-signing-rebind.service"'
+target=/etc/udev/rules.d/90-yubikey-signing-rebind.rules
+
+if ! printf '%s\n' "$rule" | diff -q - "$target" >/dev/null 2>&1; then
+    echo "Installing $target (sudo)"
+    printf '%s\n' "$rule" | sudo tee "$target" >/dev/null
+    sudo udevadm control --reload
+fi
+{{- end }}
