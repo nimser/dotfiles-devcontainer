@@ -26,6 +26,15 @@ set -euo pipefail
 
 systemctl --user daemon-reload
 
+# The distro's socket-activated pair (/usr/lib/systemd/user/ssh-agent.socket
+# listening on %t/openssh_agent) name-collides with our ssh-agent.service:
+# any client touching that socket "activates" our unit (stop/start churn,
+# bind races → status=2), and its ExecStartPost poisons the user-manager env
+# with SSH_AUTH_SOCK=%t/openssh_agent, a dead-end fd nothing serves. Mask it
+# and scrub the env so udev-triggered units reach the stable socket.
+systemctl --user mask --now ssh-agent.socket
+systemctl --user unset-environment SSH_AUTH_SOCK
+
 # Enable the units so they start on boot
 systemctl --user enable cpu-watchdog.service
 systemctl --user enable docker-cleanup.timer
