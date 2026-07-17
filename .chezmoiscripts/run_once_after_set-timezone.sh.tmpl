@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+{{- if and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")) }}
+set -euo pipefail
+
+# Set tpad's system timezone once. It shipped with /etc/localtime -> UTC, while
+# our TZ is only exported by login shells (~/.profile -> ~/.environment). Non-login
+# processes (e.g. the tmux server) therefore rendered UTC in their strftime output.
+# Fixing it at the system level makes time correct everywhere (tmux status bar,
+# logs, cron, ...) with no per-process TZ workarounds. Containers keep using the
+# TZ export since their /etc/localtime is UTC and image-owned.
+# Value mirrors TZ in ~/.environment.
+want=Europe/Paris
+
+current=$(timedatectl show -p Timezone --value 2>/dev/null || cat /etc/timezone 2>/dev/null || true)
+if [ "$current" != "$want" ]; then
+    echo "Setting system timezone -> $want (sudo)"
+    sudo timedatectl set-timezone "$want"
+fi
+{{- end }}
