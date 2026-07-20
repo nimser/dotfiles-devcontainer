@@ -29,7 +29,6 @@ viteplus = "latest"
 # artifact attestation/SLSA provenance, so `latest` is safe to track again.
 "github:earendil-works/pi" = "latest"
 claude = "latest"
-"pipx:realiti4/claude-swap" = "latest"
 "npm:pi-claude-auth" = "latest"
 fzf = "latest"
 age = "latest"
@@ -42,6 +41,11 @@ jq = "1.8.1"
 {{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")))}} 
 # only for tpad itself, excluding containers running on it
 "github:yt-dlp/yt-dlp" = "latest"
+"pipx:realiti4/claude-swap" = "latest"
+"github:olastor/age-plugin-fido2-hmac" = "latest"
+"github:Foxboron/age-plugin-tpm" = "latest"
+"github:str4d/age-plugin-yubikey" = "0.5.0"
+"github:cjpais/Handy" = { version = "latest", matching = "AppImage" }
 {{- end }}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "homelab")}}
 # only for the homelab devpod
@@ -52,13 +56,6 @@ helm = "latest"
 "aqua:k9s" = "latest"
 "aqua:fluxcd/flux2" = "latest"
 "aqua:siderolabs/talos" = "latest" # talosctl
-{{- end}}
-{{- if not (stat "/.dockerenv") }} 
-# for hosts that are not a container
-"github:olastor/age-plugin-fido2-hmac" = "latest"
-"github:Foxboron/age-plugin-tpm" = "latest"
-"github:str4d/age-plugin-yubikey" = "0.5.0"
-"github:cjpais/Handy" = { version = "latest", matching = "AppImage" }
 {{- end}}
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
