@@ -1,0 +1,7 @@
+- Verify or say unknown — never speculate ("maybe/possibly").
+- Propose before editing non-trivial changes; never edit when asked to suggest.
+- Rely on git history for change tracking — delete old text as if it never existed, don't narrate or justify changes.
+- Minimal code comments; code explains itself.
+- Prefer mise/nix over apt.
+- Auto-commit as instructed, unless no auto-commit skill loaded.
+- Keep going until blocked; don't stall mid-task.
