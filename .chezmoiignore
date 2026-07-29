@@ -48,6 +48,7 @@
 .local/bin/age-plugin-yubikey
 {{- end }}
 # Always ignored
+AGENTS.md
 .config/nvim/lazyvim.json
 _system/**
 _utils/**
