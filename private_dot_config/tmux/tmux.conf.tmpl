@@ -82,10 +82,11 @@ bind-key -T copy-mode-vi v   send-keys -X begin-selection
 bind-key -T copy-mode-vi V   send-keys -X select-line
 bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
 
-# yank -> xclip on host; set-clipboard above also fires OSC52 as a fallback for remote/headless
-bind-key -T copy-mode-vi y      send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard 2>/dev/null"
-bind-key -T copy-mode-vi Enter  send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard 2>/dev/null"
-bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard 2>/dev/null"
+# yank -> OSC52 only (set-clipboard above). A parallel xclip pipe would race
+# Alacritty for CLIPBOARD ownership and lose ("Failed to set new owner of XCB selection").
+bind-key -T copy-mode-vi y      send-keys -X copy-pipe-and-cancel
+bind-key -T copy-mode-vi Enter  send-keys -X copy-pipe-and-cancel
+bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel
 
 # explicit arrow movement in copy mode (you use arrows, not hjkl)
 bind-key -T copy-mode-vi Up    send-keys -X cursor-up
