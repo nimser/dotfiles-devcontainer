@@ -38,6 +38,12 @@
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
     "source=${localEnv:HOME}/.ssh/container-shared,target=/mnt/host/container-shared,type=bind,readonly",
     "source=${localEnv:HOME}/.ssh/gopass-deploy-key,target=/mnt/host/gopass-deploy-key,type=bind,readonly",
+    // age-plugin bridge sockets, served by systemd user units on the host.
+    // Bind-mounted (not SSH-forwarded): a forwarded socket is re-bound by every
+    // `ssh <ws>.devpod` session and left stale when that session ends, which
+    // killed every decrypt until the next reconnect.
+    "source=${localEnv:HOME}/.local/state/age-plugin-tpm,target=/mnt/host/age-plugin-tpm,type=bind",
+    "source=${localEnv:HOME}/.local/state/age-plugin-yubikey,target=/mnt/host/age-plugin-yubikey,type=bind",
     "source=${localEnv:HOME}/skills,target=/home/vscode/skills,type=bind",
     "source=${localEnv:HOME}/.pi,target=/home/vscode/.pi,type=bind",
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind"
