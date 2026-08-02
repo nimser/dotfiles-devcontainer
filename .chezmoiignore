@@ -47,6 +47,11 @@
 .local/bin/age-plugin-tpm
 .local/bin/age-plugin-yubikey
 {{- end }}
+{{- if (ne (env "DEVPOD_WORKSPACE_ID") "metagrowth") }}
+# pi extensions developed in the metagrowth devpod; the symlink target only
+# exists there, so never materialise it anywhere else.
+.pi/agent/extensions/**
+{{- end }}
 # Always ignored
 AGENTS.md
 .config/nvim/lazyvim.json
