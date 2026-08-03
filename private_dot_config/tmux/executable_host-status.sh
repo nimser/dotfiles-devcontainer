@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
-# status-left segment for tmux.
-#   - $1 is the *current pane's* @ssh_remote_host user option, set by the fish `ssh` wrapper when
-#     it runs inside tmux on the host. tmux.conf passes it in via '#{@ssh_remote_host}' so this
-#     always reflects the pane actually being viewed, not a server-wide flag — otherwise SSH'ing
-#     in one pane would tag every pane/window/session in the whole tmux server, and the tag could
-#     get stuck forever if that pane were ever killed instead of ssh exiting cleanly.
-#   - Otherwise show the local hostname (so the bar always says where tmux itself is running).
-#
-# Per-host colour: a small palette of muted dark tones; the host name is hashed to pick one index,
-# so the same host always gets the same colour, and different hosts differ subtly.
+# tmux status-left: $1 is the viewed pane's @ssh_remote_host (fish's `ssh` wrapper sets it), else the local hostname.
+# Per-pane, not server-wide: one SSH would otherwise tag every pane, and the tag would stick if that pane were killed.
+# The host name is hashed into a small palette of muted tones, so a host always gets the same colour.
 
 host=$1
 

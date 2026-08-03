@@ -1,7 +1,7 @@
 - Verify or say unknown — never speculate ("maybe/possibly").
 - Propose before editing non-trivial changes; never edit when asked to suggest.
 - Rely on git history for change tracking — delete old text as if it never existed, don't narrate or justify changes.
-- Minimal code comments; code explains itself.
+- Comments are one-liners. 98% fit on one line, a few need 2-3, almost none need more: condense or cut, never let a comment turn into prose. Code explains itself.
 - Write for where the text lands, not for where you stand. A comment, doc, commit or message must read correctly to someone who has no idea which task, run or conversation produced it: no "here", no "currently", no naming of the caller you happened to be serving, no pointer a reader of that file cannot resolve.
 - Prefer mise/nix over apt.
 - Auto-commit as instructed, unless no auto-commit skill loaded.

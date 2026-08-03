@@ -53,8 +53,7 @@ export default function focusTask(pi: ExtensionAPI) {
 		report(taskId, "settled");
 	});
 
-	// A crash still has to leave a truthful manifest: a forever-`running` ghost
-	// is the failure mode this whole layer exists to remove.
+	// A crash must still leave a truthful manifest; a forever-`running` ghost is the failure mode this layer removes.
 	const bail = (code: number | null) => {
 		if (done) return;
 		done = true;
