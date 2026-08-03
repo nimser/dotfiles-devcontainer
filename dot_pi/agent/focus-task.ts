@@ -1,5 +1,6 @@
 /**
- * focus-task — worker side of pi-focus (PRD 03).
+ * focus-task — worker side of pi-focus
+ * (spec: ~/.pi/artifacts/pi-focus/prd-03-focus-task-extension.md).
  *
  * Loaded only by `pi-focus spawn` (`-e ~/.pi/agent/focus-task.ts`), never
  * auto-discovered: it lives outside ~/.pi/agent/extensions/ on purpose, so an
