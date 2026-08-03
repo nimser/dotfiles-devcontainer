@@ -48,9 +48,10 @@
 .local/bin/age-plugin-yubikey
 {{- end }}
 {{- if (ne (env "DEVPOD_WORKSPACE_ID") "metagrowth") }}
-# pi extensions developed in the metagrowth devpod; the symlink target only
-# exists there, so never materialise it anywhere else.
+# pi extensions developed in the metagrowth devpod; the symlink targets only
+# exist there, so never materialise them anywhere else.
 .pi/agent/extensions/**
+.pi/agent/tools/**
 {{- end }}
 # Always ignored
 AGENTS.md
