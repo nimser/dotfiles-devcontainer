@@ -6,7 +6,10 @@
 {{- $managed := dict
     "defaultProvider" "anthropic"
     "defaultModel"    "claude-opus-5"
-    "packages"        (list "../../.local/share/mise/installs/npm-pi-claude-auth/latest/lib/node_modules/pi-claude-auth/")
+    "packages"        (list
+        "../../.local/share/mise/installs/npm-pi-claude-auth/latest/lib/node_modules/pi-claude-auth/"
+        "git:git@github.com:nimser/pi-model-rotation.git@v0.1.0"
+    )
     "warnings"        (dict "anthropicExtraUsage" false)
     "enabledModels"   (list
         "opencode-go/*"
