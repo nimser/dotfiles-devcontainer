@@ -51,11 +51,13 @@ if [ -f "$HOME/.environment" ]; then
   . "$HOME/.environment"
 fi
 
-if [ -t 0 ]; then
-  if command -v fish > /dev/null 2>&1; then
-    exec fish
-  fi
-fi
+case $- in
+  *i*)
+    if command -v fish > /dev/null 2>&1; then
+      exec fish
+    fi
+    ;;
+esac
 
 # if running bash, source .bashrc
 if [ -n "$BASH_VERSION" ]; then
