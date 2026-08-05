@@ -9,7 +9,7 @@
     "packages"        (list
         "../../.local/share/mise/installs/npm-pi-claude-auth/latest/lib/node_modules/pi-claude-auth/"
         "git:git@github.com:nimser/pi-model-rotation.git@v0.1.0"
-        "https://github.com/nimser/pi-browser-guard.git@v0.1.2"
+        "https://github.com/nimser/pi-browser-guard.git@v0.1.3"
     )
     "warnings"        (dict "anthropicExtraUsage" false)
     "enabledModels"   (list
