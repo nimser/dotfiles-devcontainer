@@ -5,10 +5,10 @@
 # Read current file from stdin
 current=$(cat)
 
-# Extract unmanaged sections (e.g., [credential] injected by DevPod)
+# Extract unmanaged sections: [credential] and any [credential "<url>"] subsection
+# (injected by DevPod, gh auth setup-git, etc.)
 preserved=$(echo "$current" | awk '
-  /^\[credential\]/ { found=1 }
-  /^\[/ && !/^\[credential\]/ { found=0 }
+  /^[[:space:]]*\[/ { found = /^[[:space:]]*\[credential([[:space:]]|\])/ }
   found { print }
 ')
 
