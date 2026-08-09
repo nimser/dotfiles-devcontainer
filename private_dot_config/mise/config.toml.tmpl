@@ -47,6 +47,10 @@ jq = "1.8.1"
 "github:str4d/age-plugin-yubikey" = "0.5.0"
 "github:cjpais/Handy" = { version = "latest", matching = "AppImage" }
 {{- end }}
+{{- if (eq (env "DEVPOD_WORKSPACE_ID") "metagrowth")}}
+# only for the metagrowth devpod: the mirror publisher filters history with it
+"pipx:git-filter-repo" = "latest"
+{{- end}}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "homelab")}}
 # only for the homelab devpod
 kubectl = "latest"
