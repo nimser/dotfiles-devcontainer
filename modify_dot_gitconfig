@@ -1,15 +1,23 @@
 #!/bin/bash
 # chezmoi modify script for .gitconfig
-# Preserves unmanaged sections (like [credential] injected by DevPod)
+# Preserves unmanaged credential sections except broken DevPod agent helpers
 
-# Read current file from stdin
 current=$(cat)
 
-# Extract unmanaged sections: [credential] and any [credential "<url>"] subsection
-# (injected by DevPod, gh auth setup-git, etc.)
-preserved=$(echo "$current" | awk '
-  /^[[:space:]]*\[/ { found = /^[[:space:]]*\[credential([[:space:]]|\])/ }
-  found { print }
+preserved=$(printf '%s\n' "$current" | awk '
+  function flush() {
+    if (block != "" && !managed && index(tolower(block), "devpod") == 0) printf "%s", block
+    block = ""
+  }
+  /^[[:space:]]*\[/ {
+    flush()
+    header = tolower($0)
+    gsub(/^[[:space:]]+|[[:space:]]+$/, "", header)
+    found = header ~ /^\[credential([[:space:]]|\])/
+    managed = header == "[credential \"https://github.com\"]" || header == "[credential \"https://gist.github.com\"]"
+  }
+  found { block = block $0 ORS }
+  END { flush() }
 ')
 
 # Write our managed template
@@ -37,6 +45,12 @@ cat << 'MANAGED'
 [url "git@github.com:"]
   pushInsteadOf = git://github.com/
   pushInsteadOf = https://github.com/
+[credential "https://github.com"]
+  helper =
+  helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+  helper =
+  helper = !gh auth git-credential
 [alias]
   cl = clone
   co = checkout
