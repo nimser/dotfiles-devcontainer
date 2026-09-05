@@ -38,8 +38,8 @@ sops = "latest"
 yq = "latest"
 jq = "1.8.1"
 "aqua:nushell/nushell" = "latest"
-{{- if (and (eq .chezmoi.hostname "tpad") (not (stat "/.dockerenv")))}} 
-# only for tpad itself, excluding containers running on it
+{{- if (and (has .chezmoi.hostname (list "tpad" "px13")) (not (stat "/.dockerenv")))}} 
+# only for the workstations themselves, excluding containers running on them
 "github:yt-dlp/yt-dlp" = "latest"
 "pipx:realiti4/claude-swap" = "latest"
 "github:olastor/age-plugin-fido2-hmac" = "latest"
