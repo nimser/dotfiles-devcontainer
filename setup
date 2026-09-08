@@ -359,6 +359,7 @@ install_nix_packages || fail "Nix package installation failed"
 # one-time external token: the first private apply is what restores that store.
 prepare_mise_github_token || fail "mise needs an external GitHub token for the first bootstrap"
 run_logged mise-packages install_mise_packages || fail "mise tools or caches failed"
+run_logged appimage-desktop "$HOME/.local/bin/mise-appimage-desktop" || fail "AppImage desktop integration failed"
 
 if "$with_secrets"; then
   # Public phase has deployed the age identity references and installed the
