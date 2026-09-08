@@ -13,12 +13,14 @@ bat = "latest"
 "aqua:cli/cli" = "latest" #github-cli
 "gitlab:gitlab-org/cli" = "latest" #gitlab-cli
 "aqua:tree-sitter/tree-sitter" = "latest"
-"github:fish-shell/fish-shell" = "latest"
 "aqua:dprint/dprint" = "latest"
 "aqua:mvdan/sh" = "latest" # shfmt
-"github:pkgxdev/pkgx" = "latest"
-"github:pkgxdev/pkgm" = "latest"
 direnv = "latest"
+{{- if (stat "/.dockerenv")}}
+# Containers only: hosts log in through the distro's own fish, and a second
+# copy would win the PATH race against the shell systemd re-execs.
+"github:fish-shell/fish-shell" = "latest"
+{{- end}}
 node = "latest"
 uv = "latest"
 viteplus = "latest"
@@ -29,7 +31,6 @@ pnpm = "latest"
 # artifact attestation/SLSA provenance, so `latest` is safe to track again.
 "github:earendil-works/pi" = "latest"
 claude = "latest"
-"npm:pi-claude-auth" = "latest"
 fzf = "latest"
 age = "latest"
 gopass = "1.17.0-rc.2"
@@ -46,6 +47,7 @@ jq = "1.8.1"
 "github:Foxboron/age-plugin-tpm" = "latest"
 "github:str4d/age-plugin-yubikey" = "0.5.0"
 "github:cjpais/Handy" = { version = "latest", matching = "AppImage" }
+"aqua:typst/typst" = "latest"
 {{- end }}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "metagrowth")}}
 # only for the metagrowth devpod: the mirror publisher filters history with it
@@ -67,3 +69,9 @@ minimum_release_age = "1h" # don't install something younger that this age
 use_versions_host = false # disable using `mise-versions` (https://mise-versions.jdx.dev/) use github api directly instead
 fetch_remote_versions_cache = "1h" # default
 cache_prune_age = "7d" # default is 30d too long
+[settings.github]
+# The first bootstrap supplies MISE_GITHUB_TOKEN from outside the encrypted
+# dotfiles. Once gopass and the bg store are available, later mise runs can
+# retrieve the same token without storing it in this config.
+# stderr stays open on purpose: a suppressed passphrase prompt reads as a hang.
+credential_command = 'GOPASS_HOMEDIR="$HOME/.config/gopass/.gopass-scripts/" gopass show -o bg/github.com/pat-classic_public-repos || true'
