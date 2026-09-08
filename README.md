@@ -87,6 +87,17 @@ the Handy AppImage, and keyd where `_system/<hostname>/etc/keyd` exists. Missing
 ones stop setup with the pacman or apt command to run; nothing is installed for
 you, so an unattended run can never answer a package-manager prompt.
 
+Handy stays mise-owned; Shelly's AppImage backend is disabled. The
+`mise-appimage-desktop` reconciler extracts its bundled icon into
+`~/.local/share/chezmoi-mise-handy/` and writes
+`~/.local/share/applications/chezmoi-mise-handy.desktop`, without retaining an
+extra AppImage. Setup, package-config apply hooks, and weekly maintenance run
+it. Removing Handy from the mise configuration and applying removes those
+assets, even if an old mise installation remains. After a direct uninstall,
+run `mise-appimage-desktop` for immediate cleanup; otherwise cleanup waits for
+reconciliation. A still-configured tool will be reinstalled by maintenance.
+Other launcher entries and icons are never removed.
+
 Rclone comes from Nix. Its credential wrapper calls
 `~/.nix-profile/bin/rclone` directly. Core restoration downloads to a staging
 directory, publishing the store only after a successful transfer and Git check.
