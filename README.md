@@ -87,16 +87,26 @@ the Handy AppImage, and keyd where `_system/<hostname>/etc/keyd` exists. Missing
 ones stop setup with the pacman or apt command to run; nothing is installed for
 you, so an unattended run can never answer a package-manager prompt.
 
-Handy stays mise-owned; Shelly's AppImage backend is disabled. The
-`mise-appimage-desktop` reconciler extracts its bundled icon into
-`~/.local/share/chezmoi-mise-handy/` and writes
-`~/.local/share/applications/chezmoi-mise-handy.desktop`, without retaining an
-extra AppImage. Setup, package-config apply hooks, and weekly maintenance run
-it. Removing Handy from the mise configuration and applying removes those
-assets, even if an old mise installation remains. After a direct uninstall,
-run `mise-appimage-desktop` for immediate cleanup; otherwise cleanup waits for
+AppImages stay mise-owned; Shelly's AppImage backend is disabled.
+`mise-appimage-desktop` discovers `.AppImage` files recursively in configured,
+active mise installations, including multiple apps per tool. It extracts each
+bundled desktop entry and icon into `~/.local/share/chezmoi-mise-appimages/`,
+and creates a namespaced launcher in `~/.local/share/applications/`. It retains
+no additional application binaries. Localized names, categories, MIME types,
+launch arguments and file/URL placeholders come from the bundled entry.
+Desktop actions and bundled working-directory/helper references are omitted;
+launching uses the AppImage directly rather than D-Bus activation. Missing or
+ambiguous root desktop entries and unsupported icons fail visibly before any
+existing integration is replaced or removed.
+
+Setup, package-config apply hooks, and weekly maintenance run reconciliation.
+Removing a tool from the mise configuration and applying removes its tracked
+assets, even if an old installation remains. After a direct uninstall, run
+`mise-appimage-desktop` for immediate cleanup; otherwise cleanup waits for
 reconciliation. A still-configured tool will be reinstalled by maintenance.
-Other launcher entries and icons are never removed.
+Only assets recorded in the integration manifest are removed; unrelated icons
+and launchers are preserved. The original Handy-only generated assets are
+removed during migration. `XDG_DATA_HOME` overrides the data directory.
 
 Rclone comes from Nix. Its credential wrapper calls
 `~/.nix-profile/bin/rclone` directly. Core restoration downloads to a staging
