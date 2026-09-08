@@ -20,12 +20,15 @@ Run setup on the target machine from this checkout:
 bash setup
 ```
 
-On a host, this bootstraps the mise CLI, deploys unencrypted configuration,
-reports missing native packages, installs mise/Nix packages, then applies
-encrypted files, restores stores, and activates services. Have the matching
-decryption hardware/key available. On a clean host, the first
-run still needs a GitHub token before mise can install its GitHub-backed tools;
-provide it without putting it in the repository:
+On a host, this bootstraps the mise CLI, deploys public configuration, reports
+missing native packages, installs Nix, then installs only the declared age,
+gopass and age-plugin bootstrap tools. With the matching decryption
+hardware/key, it applies encrypted files, restores the bg store, reads the
+GitHub token from that store, and only then installs the remaining mise tools
+and activates services. A clean host still needs working access to the bg
+GitLab repository through its approved SSH key or agent; it must not receive a
+token or secret through dotfiles. If that access is unavailable, provide a
+GitHub token only in the current shell:
 
 ```bash
 read -rsp 'GitHub token: ' MISE_GITHUB_TOKEN; export MISE_GITHUB_TOKEN; echo
@@ -35,8 +38,8 @@ unset MISE_GITHUB_TOKEN
 
 Existing installations are reused; a failed required stage stops setup with a
 log and a nonzero exit status. Rerun the same command after resolving the
-failure. After the first private apply restores the bg store, mise reads the
-token through its gopass credential command on later runs.
+failure. After the first encrypted apply and bg restore, mise reads the token
+through its gopass credential command on later runs.
 
 After recovering a px13 default, capture only the files you have reviewed
 from the host into this checkout, then inspect the source diff:
@@ -70,6 +73,10 @@ workstations. The timer refreshes mise itself, upgrades/installs configured mise
 tools, installs the declared Nix package set, updates tldr, and rebuilds bat's
 cache. It does not perform a full apply or decrypt secrets. Failures stop the
 service and are recorded in its journal. DevPod volume warming stays separate.
+The warm image follows the installer's latest mise release by default; its
+2-hour best-effort timer rebuilds that seed only when the image is 90 days old,
+passing an exact version and date so Docker invalidates the intended build
+layer. It never removes volumes or recreates an active agent container.
 
 Tools track `latest`. A pinned version carries the reason on the line above it
 in `~/.config/mise/config.toml`, and an unexplained pin fails the source checks.
@@ -83,7 +90,9 @@ running container. The distro owns hardware, desktop and browser integration,
 and the login fish; containers get fish from mise instead. Nix package selection
 comes from the rendered `~/.config/nixpkgs/config.nix`: containers get the
 container set, the workstations in the hostname list also get desktop packages,
-and every other machine gets the plain host set.
+and every other machine gets the plain host set. Non-workstation hosts retain
+common CLI configuration and the maintenance timer; desktop, hardware, backup,
+bridge and workstation-only user units are ignored.
 
 Setup checks the native libraries, executables and services that the deployed
 mise configuration implies — libfido2, pcsclite with pcscd and the CCID reader
@@ -140,6 +149,17 @@ chezmoi apply --exclude=encrypted,scripts
 Focused source checks: `python3 _utils/test-bootstrap.py` (Python, chezmoi,
 Bash, and Fish required), `python3 _utils/test-appimage-desktop.py`, and
 `python3 -m unittest discover -s _system/px13/tests`.
-They do not test downloads or hardware decryption.
+The bootstrap check covers server, workstation and container role rendering and
+the credential-free tool stage, but these checks do not test downloads or
+hardware decryption. A bare Debian test container needs Fish and mise's
+chezmoi before running the first check:
+
+```bash
+apt-get -qq update && apt-get -qq install -y python3 fish curl ca-certificates git
+curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise MISE_QUIET=1 sh
+mise install chezmoi
+MISE_YES=1 mise exec chezmoi -- python3 _utils/test-bootstrap.py
+```
+
 Test recovery on the current host first; use a fresh VM/snapshot for the clean
 workstation test. Container testing must include first login and bg access.

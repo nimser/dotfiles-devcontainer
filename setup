@@ -253,11 +253,41 @@ check_native_dependencies() {
 }
 check_native_dependencies || fail "Native dependencies are missing"
 
-# Mise still needs GitHub authentication for its configured release tools, and a
-# clean machine has no restored bg store until private apply, so an encrypted
-# token cannot be the first credential. Accept it from the caller (or an already
-# working installation) and keep it process-local. After private apply, mise's
-# credential_command reads the same entry from gopass for later runs.
+# Tools that open the encrypted dotfiles, taken from the deployed configuration
+# so this never becomes a second hand-maintained list. Backend-qualified keys
+# such as github:Foxboron/age-plugin-tpm are matched on their trailing name.
+bootstrap_tool_names() {
+  sed -n 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *=.*/\1/p' "$HOME/.config/mise/config.toml" \
+    | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)$'
+}
+
+bootstrap_tool_specs() {
+  sed -n 's/^\("\{0,1\}[^"= ]*"\{0,1\} *= *"[^"]*"\)$/\1/p' "$HOME/.config/mise/config.toml" \
+    | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)' \
+    | sed -E 's/^"([^"]+)" *= *"([^"]+)"$/\1@\2/; s/^([^ =]+) *= *"([^"]+)"$/\1@\2/'
+}
+
+# The decryption toolchain comes from public releases and needs no credential,
+# so it can be installed before any secret exists. The rest of the toolchain
+# resolves dozens of `latest` versions against the GitHub API, which an
+# unauthenticated address cannot afford, and its token lives in the bg store.
+install_mise_bootstrap() (
+  set -euo pipefail
+  cd "$HOME" || exit 1
+  mise_cmd=$(command -v mise) || { echo "mise was not deployed by chezmoi" >&2; exit 1; }
+  mapfile -t specs < <(bootstrap_tool_specs)
+  [ "${#specs[@]}" -gt 0 ] || { echo "No decryption tools are declared" >&2; exit 1; }
+  "$mise_cmd" trust "$HOME/.config/mise/config.toml" || exit 1
+  # Pass versions explicitly: `mise install tool` resolves an unqualified tool
+  # to latest and would silently bypass an intentional compatibility pin.
+  "$mise_cmd" install "${specs[@]}" || exit 1
+)
+
+# Mise needs GitHub authentication for the breadth of its configured release
+# tools. The bg store holds that token, and the decryption toolchain plus the
+# hardware key open the store, so the store is the first source consulted on a
+# machine that has reached this point. A caller-supplied value still wins, and
+# after apply mise's credential_command reads the same entry for later runs.
 prepare_mise_github_token() {
   local variable candidate gopass_cmd
 
@@ -271,8 +301,6 @@ prepare_mise_github_token() {
     fi
   done
 
-  # This covers reruns after gopass was already installed and its stores were
-  # restored. It deliberately does not make the first bootstrap depend on it.
   # stdin is closed and the call is capped: a passphrase prompt must surface as
   # a visible failure, never as a silent wait.
   gopass_cmd=$(command -v gopass 2>/dev/null || true)
@@ -298,16 +326,15 @@ prepare_mise_github_token() {
 
   cat >&2 <<'EOF'
 No GitHub token is available for mise.
-The first clean bootstrap must receive one from the caller because the
-encrypted gopass entry is not readable until private apply restores its store
-and identities.
-Set it only in this shell, then rerun setup:
+The bg gopass store is the intended source. It is unreadable when the store was
+not restored, when the matching hardware key is absent, or when this run
+deferred secrets. Connect the key and rerun setup, or supply a token only in
+this shell:
 
   read -rsp 'GitHub token: ' MISE_GITHUB_TOKEN; export MISE_GITHUB_TOKEN; echo
   bash setup
 
-The token is not written to the dotfiles or setup state. Once private apply
-finishes, later mise runs can retrieve it from the restored bg gopass store.
+The token is not written to the dotfiles or setup state.
 EOF
   return 1
 }
@@ -367,25 +394,36 @@ done
 # selection needs no environment variable and no remembered state.
 install_nix_packages || fail "Nix package installation failed"
 
-# On a rerun where the bg store and decrypted identities already exist, the
-# token can be recovered without caller input. A clean machine still needs the
-# one-time external token: the first private apply is what restores that store.
-prepare_mise_github_token || fail "mise needs an external GitHub token for the first bootstrap"
-run_logged mise-packages install_mise_packages || fail "mise tools or caches failed"
-run_logged appimage-desktop "$HOME/.local/bin/appimage-desktop" || fail "AppImage desktop integration failed"
+run_logged mise-bootstrap install_mise_bootstrap \
+  || fail "The decryption toolchain failed to install"
 
 if "$with_secrets"; then
-  # Public phase has deployed the age identity references and installed the
-  # plugins. Decryption still requires the matching hardware/key material.
+  # Public phase has deployed the age identity references and the toolchain is
+  # in place. Decryption still requires the matching hardware/key material.
   for tool in age gopass; do
     command -v "$tool" >/dev/null 2>&1 \
-      || fail "Missing $tool after mise install; rerun mise install before decrypting secrets"
+      || fail "Missing $tool after the bootstrap install; rerun setup before decrypting secrets"
   done
   for tool in age-plugin-tpm age-plugin-yubikey age-plugin-fido2-hmac; do
     mise_declares "$tool" || continue
     command -v "$tool" >/dev/null 2>&1 \
-      || fail "Missing $tool after mise install; rerun mise install before decrypting secrets"
+      || fail "Missing $tool after the bootstrap install; rerun setup before decrypting secrets"
   done
+  # Encrypted files only: the once/onchange hooks need tools that the token
+  # gated install has not delivered yet.
+  run_logged secrets-apply "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply --include=encrypted \
+    || fail "Decrypting the private configuration failed"
+  # bg holds the token the rest of the toolchain needs. The remaining stores
+  # are restored by the hook during the full apply below.
+  run_logged store-restore "$HOME/.local/bin/rclone-restore" bg \
+    || fail "Restoring the bg password store failed"
+fi
+
+prepare_mise_github_token || fail "mise has no GitHub token for the remaining tools"
+run_logged mise-packages install_mise_packages || fail "mise tools or caches failed"
+run_logged appimage-desktop "$HOME/.local/bin/appimage-desktop" || fail "AppImage desktop integration failed"
+
+if "$with_secrets"; then
   run_logged private-apply "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply \
     || fail "Private configuration, store restoration, or host activation failed"
   mkdir -p "$HOME/.local/state/chezmoi" \
