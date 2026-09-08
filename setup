@@ -257,14 +257,19 @@ check_native_dependencies || fail "Native dependencies are missing"
 # so this never becomes a second hand-maintained list. Backend-qualified keys
 # such as github:Foxboron/age-plugin-tpm are matched on their trailing name.
 bootstrap_tool_names() {
-  sed -n 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *=.*/\1/p' "$HOME/.config/mise/config.toml" \
+  sed -n '/^[[:space:]]*#/d; s/^"\{0,1\}\([^"= ]*\)"\{0,1\} *=.*/\1/p' \
+    "$HOME/.config/mise/config.toml" \
     | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)$'
 }
 
+# Both the bare `tool = "version"` form and the table form that carries install
+# options, so a tool gaining an option keeps its version instead of losing it.
 bootstrap_tool_specs() {
-  sed -n 's/^\("\{0,1\}[^"= ]*"\{0,1\} *= *"[^"]*"\)$/\1/p' "$HOME/.config/mise/config.toml" \
-    | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)' \
-    | sed -E 's/^"([^"]+)" *= *"([^"]+)"$/\1@\2/; s/^([^ =]+) *= *"([^"]+)"$/\1@\2/'
+  sed -n -e '/^[[:space:]]*#/d' \
+    -e 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *= *"\([^"]*\)".*/\1@\2/p' \
+    -e 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *= *{\(.*,\)\{0,1\} *version *= *"\([^"]*\)".*/\1@\3/p' \
+    "$HOME/.config/mise/config.toml" \
+    | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)@'
 }
 
 # The decryption toolchain comes from public releases and needs no credential,
@@ -275,8 +280,22 @@ install_mise_bootstrap() (
   set -euo pipefail
   cd "$HOME" || exit 1
   mise_cmd=$(command -v mise) || { echo "mise was not deployed by chezmoi" >&2; exit 1; }
+  mapfile -t names < <(bootstrap_tool_names)
   mapfile -t specs < <(bootstrap_tool_specs)
   [ "${#specs[@]}" -gt 0 ] || { echo "No decryption tools are declared" >&2; exit 1; }
+  # A declared tool whose version no expression reads would be reported as
+  # required and never installed, so the parser gap must stop the run here
+  # rather than surface later as a missing binary.
+  for name in "${names[@]}"; do
+    found=false
+    for spec in "${specs[@]}"; do
+      if [ "${spec%@*}" = "$name" ]; then
+        found=true
+        break
+      fi
+    done
+    "$found" || { echo "No version read for the declared tool $name" >&2; exit 1; }
+  done
   "$mise_cmd" trust "$HOME/.config/mise/config.toml" || exit 1
   # Pass versions explicitly: `mise install tool` resolves an unqualified tool
   # to latest and would silently bypass an intentional compatibility pin.
