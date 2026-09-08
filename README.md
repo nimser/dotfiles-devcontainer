@@ -87,12 +87,19 @@ the Handy AppImage, and keyd where `_system/<hostname>/etc/keyd` exists. Missing
 ones stop setup with the pacman or apt command to run; nothing is installed for
 you, so an unattended run can never answer a package-manager prompt.
 
-AppImages stay mise-owned; Shelly's AppImage backend is disabled.
-`mise-appimage-desktop` discovers `.AppImage` files recursively in configured,
-active mise installations, including multiple apps per tool. It extracts each
-bundled desktop entry and icon into `~/.local/share/chezmoi-mise-appimages/`,
-and creates a namespaced launcher in `~/.local/share/applications/`. It retains
-no additional application binaries. Localized names, categories, MIME types,
+AppImages are either mise-owned or manually managed; Shelly's AppImage backend
+is disabled. `appimage-desktop` discovers `.AppImage` files recursively in
+configured, active mise installations and `~/.local/share/AppImage/`, including
+multiple apps per tool. Duplicate discoveries are deduplicated by resolved
+binary path, with mise taking precedence. Manually managed binaries are never
+updated, deleted or chmodded by the reconciler: supply an executable AppImage
+and update it yourself. Only trusted AppImages belong in that directory;
+metadata extraction executes their bundled runtime.
+
+The reconciler extracts each bundled desktop entry and icon into
+`~/.local/share/chezmoi-mise-appimages/` and creates a namespaced launcher in
+`~/.local/share/applications/`. It retains no additional application binaries.
+Localized names, categories, MIME types,
 launch arguments and file/URL placeholders come from the bundled entry.
 Desktop actions and bundled working-directory/helper references are omitted;
 launching uses the AppImage directly rather than D-Bus activation. Missing or
@@ -102,11 +109,15 @@ existing integration is replaced or removed.
 Setup, package-config apply hooks, and weekly maintenance run reconciliation.
 Removing a tool from the mise configuration and applying removes its tracked
 assets, even if an old installation remains. After a direct uninstall, run
-`mise-appimage-desktop` for immediate cleanup; otherwise cleanup waits for
+`appimage-desktop` for immediate cleanup; otherwise cleanup waits for
 reconciliation. A still-configured tool will be reinstalled by maintenance.
+Run the same command after adding, replacing, renaming or deleting a manually
+managed AppImage to refresh its icon and launcher immediately; weekly
+maintenance also reconciles this directory.
 Only assets recorded in the integration manifest are removed; unrelated icons
 and launchers are preserved. The original Handy-only generated assets are
-removed during migration. `XDG_DATA_HOME` overrides the data directory.
+removed during migration. `XDG_DATA_HOME` overrides both the manual AppImage
+source directory and the generated-assets directory.
 
 Rclone comes from Nix. Its credential wrapper calls
 `~/.nix-profile/bin/rclone` directly. Core restoration downloads to a staging
