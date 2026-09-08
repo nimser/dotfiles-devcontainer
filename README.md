@@ -64,11 +64,15 @@ key provisioning remains under `_system`.
 
 Ordinary `chezmoi apply` deploys configuration and runs applicable once/onchange
 hooks; it does not install packages. After changing package selections, rerun
-setup or wait for the host's weekly `chezmoi-refresh-externals.timer`. That
-existing timer now refreshes mise itself, upgrades/installs configured mise
+setup or wait for the weekly `chezmoi-refresh-externals.timer`, which every
+non-container host enables; hardware, desktop and backup units stay on the
+workstations. The timer refreshes mise itself, upgrades/installs configured mise
 tools, installs the declared Nix package set, updates tldr, and rebuilds bat's
 cache. It does not perform a full apply or decrypt secrets. Failures stop the
 service and are recorded in its journal. DevPod volume warming stays separate.
+
+Tools track `latest`. A pinned version carries the reason on the line above it
+in `~/.config/mise/config.toml`, and an unexplained pin fails the source checks.
 
 Every tool has one installation owner per target. mise owns the user toolchain,
 including age, gopass and the age plugins: the deployed identities need
@@ -82,10 +86,12 @@ container set, the workstations in the hostname list also get desktop packages,
 and every other machine gets the plain host set.
 
 Setup checks the native libraries, executables and services that the deployed
-mise configuration implies — libfido2, pcsclite with pcscd, ykman, FUSE 2 for
-the Handy AppImage, and keyd where `_system/<hostname>/etc/keyd` exists. Missing
-ones stop setup with the pacman or apt command to run; nothing is installed for
-you, so an unattended run can never answer a package-manager prompt.
+mise configuration implies — libfido2, pcsclite with pcscd and the CCID reader
+driver, ykman, FUSE 2 for the Handy AppImage, and keyd where
+`_system/<hostname>/etc/keyd` exists. A missing package or a disabled
+`pcscd.socket` stops setup with the pacman or apt command to run; nothing is
+installed or enabled for you, so an unattended run can never answer a
+package-manager prompt.
 
 AppImages are either mise-owned or manually managed; Shelly's AppImage backend
 is disabled. `appimage-desktop` discovers `.AppImage` files recursively in
@@ -132,6 +138,8 @@ chezmoi apply --exclude=encrypted,scripts
 ```
 
 Focused source checks: `python3 _utils/test-bootstrap.py` (Python, chezmoi,
-Bash, and Fish required). They do not test downloads or hardware decryption.
+Bash, and Fish required), `python3 _utils/test-appimage-desktop.py`, and
+`python3 -m unittest discover -s _system/px13/tests`.
+They do not test downloads or hardware decryption.
 Test recovery on the current host first; use a fresh VM/snapshot for the clean
 workstation test. Container testing must include first login and bg access.

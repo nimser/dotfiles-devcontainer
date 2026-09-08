@@ -7,7 +7,7 @@ delta = "latest"
 lazygit = "latest"
 bat = "latest"
 "github:bartei/git-agecrypt" = "latest"
-"aqua:tealdeer-rs/tealdeer" = "1.8.1"
+"aqua:tealdeer-rs/tealdeer" = "latest"
 "aqua:sharkdp/fd" = "latest"
 "github:BurntSushi/ripgrep" = "latest"
 "aqua:cli/cli" = "latest" #github-cli
@@ -16,7 +16,7 @@ bat = "latest"
 "aqua:dprint/dprint" = "latest"
 "aqua:mvdan/sh" = "latest" # shfmt
 direnv = "latest"
-{{- if (stat "/.dockerenv")}}
+{{- if (or (stat "/.dockerenv") (stat "/run/.containerenv"))}}
 # Containers only: hosts log in through the distro's own fish, and a second
 # copy would win the PATH race against the shell systemd re-execs.
 "github:fish-shell/fish-shell" = "latest"
@@ -33,18 +33,20 @@ pnpm = "latest"
 claude = "latest"
 fzf = "latest"
 age = "latest"
-gopass = "1.17.0-rc.2"
+gopass = "latest"
 sops = "latest"
 #gcloud = "latest"
 yq = "latest"
-jq = "1.8.1"
+jq = "latest"
 "aqua:nushell/nushell" = "latest"
-{{- if (and (has .chezmoi.hostname (list "tpad" "px13")) (not (stat "/.dockerenv")))}} 
+{{- if (and (has .chezmoi.hostname (list "tpad" "px13")) (not (stat "/.dockerenv")) (not (stat "/run/.containerenv")))}} 
 # only for the workstations themselves, excluding containers running on them
 "github:yt-dlp/yt-dlp" = "latest"
 "pipx:realiti4/claude-swap" = "latest"
 "github:olastor/age-plugin-fido2-hmac" = "latest"
 "github:Foxboron/age-plugin-tpm" = "latest"
+# Pinned: the identity files in ~/.local/state/age were written by this plugin
+# version, and an untested upgrade would be discovered at decryption time.
 "github:str4d/age-plugin-yubikey" = "0.5.0"
 "github:cjpais/Handy" = { version = "latest", matching = "AppImage" }
 "aqua:typst/typst" = "latest"
@@ -74,4 +76,5 @@ cache_prune_age = "7d" # default is 30d too long
 # dotfiles. Once gopass and the bg store are available, later mise runs can
 # retrieve the same token without storing it in this config.
 # stderr stays open on purpose: a suppressed passphrase prompt reads as a hang.
-credential_command = 'GOPASS_HOMEDIR="$HOME/.config/gopass/.gopass-scripts/" gopass show -o bg/github.com/pat-classic_public-repos || true'
+# stdin is closed and the call is capped so a prompt fails instead of waiting.
+credential_command = 'GOPASS_HOMEDIR="$HOME/.config/gopass/.gopass-scripts/" timeout 30 gopass show -o bg/github.com/pat-classic_public-repos < /dev/null || true'
