@@ -324,8 +324,7 @@ prepare_mise_github_token() {
   # a visible failure, never as a silent wait.
   gopass_cmd=$(command -v gopass 2>/dev/null || true)
   if [ -n "$gopass_cmd" ]; then
-    candidate=$(GOPASS_HOMEDIR="$HOME/.config/gopass/.gopass-scripts/" \
-      timeout 30 "$gopass_cmd" show -o bg/github.com/pat-classic_public-repos \
+    candidate=$(timeout 30 "$gopass_cmd" show -o bg/github.com/pat-classic_public-repos \
       < /dev/null || true)
     if [ -n "$candidate" ]; then
       export MISE_GITHUB_TOKEN="$candidate"

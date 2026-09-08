@@ -77,4 +77,4 @@ cache_prune_age = "7d" # default is 30d too long
 # retrieve the same token without storing it in this config.
 # stderr stays open on purpose: a suppressed passphrase prompt reads as a hang.
 # stdin is closed and the call is capped so a prompt fails instead of waiting.
-credential_command = 'GOPASS_HOMEDIR="$HOME/.config/gopass/.gopass-scripts/" timeout 30 gopass show -o bg/github.com/pat-classic_public-repos < /dev/null || true'
+credential_command = 'timeout 30 gopass show -o bg/github.com/pat-classic_public-repos < /dev/null || true'
