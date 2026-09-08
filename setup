@@ -187,6 +187,12 @@ mise_declares() {
 check_native_dependencies() {
   local field install packages hint
   local -a missing=() hints=()
+  # Debian keeps ldconfig and pcscd in /usr/sbin, which a non-root PATH omits.
+  local PATH="$PATH:/usr/sbin:/sbin"
+
+  # An unreadable library cache would report every dependency as missing.
+  command -v ldconfig > /dev/null 2>&1 \
+    || { echo "ldconfig is unavailable; native libraries cannot be verified" >&2; return 1; }
 
   # No pipe into grep: pipefail turns the reader's early exit into SIGPIPE on
   # ldconfig and every library would look missing.
@@ -201,6 +207,9 @@ check_native_dependencies() {
   fi
   if mise_declares 'age-plugin-yubikey'; then
     have_lib libpcsclite.so.1 || missing+=('pcsclite|libpcsclite1')
+    # The plugin reaches the key through pcscd and its CCID reader driver.
+    command -v pcscd > /dev/null 2>&1 || missing+=('pcsclite|pcscd')
+    [ -d /usr/lib/pcsc/drivers/ifd-ccid.bundle ] || missing+=('ccid|libccid')
     # ykman selects which gopass store the plugged key unlocks.
     command -v ykman > /dev/null 2>&1 || missing+=('yubikey-manager|yubikey-manager')
     if command -v systemctl > /dev/null 2>&1 \
@@ -228,15 +237,19 @@ check_native_dependencies() {
   esac
 
   if [ "${#missing[@]}" -gt 0 ]; then
-    packages=$(printf '%s\n' "${missing[@]}" | cut -d'|' -f"$field" | tr '\n' ' ')
+    # One package can cover several probes; report each name once.
+    packages=$(printf '%s\n' "${missing[@]}" | cut -d'|' -f"$field" | awk '!seen[$0]++' | tr '\n' ' ')
     echo "Missing native packages required by the configured tools:" >&2
     echo "  $install ${packages% }" >&2
   fi
-  for hint in "${hints[@]:-}"; do
-    [ -n "$hint" ] && echo "  $hint" >&2
-  done
+  if [ "${#hints[@]}" -gt 0 ]; then
+    echo "Native services required by the configured tools are not enabled:" >&2
+    for hint in "${hints[@]}"; do
+      echo "  $hint" >&2
+    done
+  fi
   echo "Run the command above, then rerun the same setup command." >&2
-  [ "${#missing[@]}" -eq 0 ]
+  return 1
 }
 check_native_dependencies || fail "Native dependencies are missing"
 
@@ -375,7 +388,9 @@ if "$with_secrets"; then
   done
   run_logged private-apply "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply \
     || fail "Private configuration, store restoration, or host activation failed"
-  touch "$HOME/.local/state/chezmoi/secrets-applied" || fail "Cannot record completed secret deployment"
+  mkdir -p "$HOME/.local/state/chezmoi" \
+    && touch "$HOME/.local/state/chezmoi/secrets-applied" \
+    || fail "Cannot record completed secret deployment"
   echo "Setup completed, including secrets and store restoration."
 elif [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
   run_logged container-finalize "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply --exclude=encrypted \
