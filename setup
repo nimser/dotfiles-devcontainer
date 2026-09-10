@@ -154,10 +154,9 @@ if ! command -v mise >/dev/null 2>&1; then
 fi
 command -v mise >/dev/null 2>&1 || fail "mise is unavailable after installation"
 
-# mise owns the installed chezmoi. A clean machine still needs one before the
-# mise configuration exists, so fetch that copy into a directory that is removed
-# when setup exits instead of leaving a second binary shadowed in PATH.
-if ! command -v chezmoi >/dev/null; then
+# An unconfigured mise shim needs a temporary chezmoi to deploy mise's config.
+# mise owns the permanent binary; the bootstrap copy is removed on exit.
+if ! chezmoi --version >/dev/null 2>&1; then
   bootstrap_bin=$(mktemp -d "${TMPDIR:-/tmp}/chezmoi-bootstrap.XXXXXX") || fail "Cannot create bootstrap directory"
   trap 'rm -rf "$bootstrap_bin"' EXIT
   installer=$(mktemp "${TMPDIR:-/tmp}/install-chezmoi.XXXXXX") || fail "Cannot create installer file"
@@ -165,8 +164,11 @@ if ! command -v chezmoi >/dev/null; then
   run_logged chezmoi-install sh "$installer" -b "$bootstrap_bin" || fail "chezmoi installation failed"
   rm -f "$installer"
   export PATH="$bootstrap_bin:$PATH"
+  CHEZMOI_BIN="$bootstrap_bin/chezmoi"
+else
+  CHEZMOI_BIN=$(command -v chezmoi) || fail "chezmoi is not available"
 fi
-CHEZMOI_BIN=$(command -v chezmoi) || fail "chezmoi is not available"
+"$CHEZMOI_BIN" --version >/dev/null 2>&1 || fail "chezmoi is unusable after bootstrap"
 
 # Deploy configuration and the mise external first. Built-in exclusions keep
 # bootstrap free of restore/activation hooks until their prerequisites exist.
