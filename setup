@@ -442,7 +442,13 @@ fi
 
 prepare_mise_github_token || fail "mise has no GitHub token for the remaining tools"
 run_logged mise-packages install_mise_packages || fail "mise tools or caches failed"
-run_logged appimage-desktop "$HOME/.local/bin/appimage-desktop" || fail "AppImage desktop integration failed"
+if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+  run_logged appimage-desktop "$HOME/.local/bin/appimage-desktop" || fail "AppImage desktop integration failed"
+  if [ -f "$HOME/.config/devpod-bootstrap/config.json" ]; then
+    run_logged devpod-bootstrap "$HOME/.local/bin/devpod-bootstrap" \
+      || fail "DevPod host initialization failed"
+  fi
+fi
 
 if "$with_secrets"; then
   run_logged private-apply "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply \

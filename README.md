@@ -24,9 +24,9 @@ On a host, this bootstraps the mise CLI, deploys public configuration, reports
 missing native packages, installs Nix, then installs only the declared age,
 gopass and age-plugin bootstrap tools. With the matching decryption
 hardware/key, it applies encrypted files, restores the bg store, reads the
-GitHub token from that store, and only then installs the remaining mise tools
-and activates services. A clean host still needs working access to the bg
-GitLab repository through its approved SSH key or agent; it must not receive a
+GitHub token from that store, and only then installs the remaining mise tools,
+reconciles host AppImages and workstation DevPod providers, and activates services.
+A clean host still needs working access to the bg GitLab repository through its approved SSH key or agent; it must not receive a
 token or secret through dotfiles. If that access is unavailable, provide a
 GitHub token only in the current shell:
 
@@ -78,6 +78,13 @@ The warm image follows the installer's latest mise release by default; its
 passing an exact version and date so Docker invalidates the intended build
 layer. It never removes volumes or recreates an active agent container.
 
+Workstation DevPod provisioning follows the [provider setup and migration guide](_infra/devpod-provisioning.md).
+Chezmoi tracks desired preferences and provider sources, never `~/.devpod` runtime
+state. Setup reconciles enabled providers; `devpod-bootstrap --check` verifies
+readiness without changing DevPod state. Docker must already work for the user.
+The retired `t163` provider is disabled, and existing providers/workspaces are
+preserved during migration.
+
 Tools track `latest`. A pinned version carries the reason on the line above it
 in `~/.config/mise/config.toml`, and an unexplained pin fails the source checks.
 
@@ -121,7 +128,8 @@ launching uses the AppImage directly rather than D-Bus activation. Missing or
 ambiguous root desktop entries and unsupported icons fail visibly before any
 existing integration is replaced or removed.
 
-Setup, package-config apply hooks, and weekly maintenance run reconciliation.
+Host setup, package-config apply hooks, and weekly maintenance run reconciliation.
+Containers neither receive the AppImage helper nor run its apply hook.
 Removing a tool from the mise configuration and applying removes its tracked
 assets, even if an old installation remains. After a direct uninstall, run
 `appimage-desktop` for immediate cleanup; otherwise cleanup waits for
@@ -147,11 +155,14 @@ chezmoi apply --exclude=encrypted,scripts
 ```
 
 Focused source checks: `python3 _utils/test-bootstrap.py` (Python, chezmoi,
-Bash, and Fish required), `python3 _utils/test-appimage-desktop.py`, and
+Bash, and Fish required), `python3 _utils/test-appimage-desktop.py`,
+`python3 _utils/test-login-secrets.py`, and
 `python3 -m unittest discover -s _system/px13/tests`.
-The bootstrap check covers server, workstation and container role rendering and
-the credential-free tool stage, but these checks do not test downloads or
-hardware decryption. A bare Debian test container needs Fish and mise's
+`python3 _utils/test-devpod-bootstrap.py` and
+`python3 _utils/test-setup-lifecycle.py` also require DevPod, yq and jq. They use
+disposable homes, real DevPod config operations, and fake Docker/installers to
+check fresh setup, migration, reruns, and failure paths. No test contacts a
+Docker daemon, downloads packages, or performs hardware decryption. A bare Debian test container needs Fish and mise's
 chezmoi before running the first check:
 
 ```bash
