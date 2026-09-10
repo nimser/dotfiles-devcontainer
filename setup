@@ -456,6 +456,10 @@ if "$with_secrets"; then
   mkdir -p "$HOME/.local/state/chezmoi" \
     && touch "$HOME/.local/state/chezmoi/secrets-applied" \
     || fail "Cannot record completed secret deployment"
+  if [ "${DEVPOD_WORKSPACE_ID:-}" = homelab ]; then
+    run_logged homelab-kube-init "$HOME/.local/bin/homelab-kube-init" \
+      || fail "Homelab kubeconfig initialization failed"
+  fi
   echo "Setup completed, including secrets and store restoration."
 elif [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
   run_logged container-finalize "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply --exclude=encrypted \
