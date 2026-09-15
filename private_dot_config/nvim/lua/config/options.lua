@@ -1,14 +1,26 @@
 -- Options are automatically loaded before lazy.nvim startup
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
+-- OSC 52 copy works everywhere, but tmux and herdr never answer the OSC 52 read
+-- query, which froze every paste for 10s. wl-paste bypasses the terminal entirely;
+-- sessions without a Wayland socket fall back to the last yank and paste externals
+-- with Ctrl+Shift+V.
+local osc52 = require("vim.ui.clipboard.osc52")
+local function paste()
+  if vim.env.WAYLAND_DISPLAY and vim.fn.executable("wl-paste") == 1 then
+    return vim.fn.systemlist({ "wl-paste", "--no-newline" })
+  end
+  return { vim.fn.getreg('"', 1, true), vim.fn.getregtype('"') }
+end
+
 vim.g.clipboard = {
   name = "OSC 52",
   copy = {
-    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-    ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    ["+"] = osc52.copy("+"),
+    ["*"] = osc52.copy("*"),
   },
   paste = {
-    ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-    ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    ["+"] = paste,
+    ["*"] = paste,
   },
 }
 
