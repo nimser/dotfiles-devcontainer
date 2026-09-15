@@ -52,6 +52,9 @@ jq = "latest"
 "github:cjpais/Handy" = { version = "latest", matching = "AppImage" }
 "aqua:typst/typst" = "latest"
 {{- end }}
+{{- if (and (eq .chezmoi.hostname "px13") (not (stat "/.dockerenv")) (not (stat "/run/.containerenv")))}}
+herdr = "latest"
+{{- end}}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "metagrowth")}}
 # only for the metagrowth devpod: the mirror publisher filters history with it
 "pipx:git-filter-repo" = "latest"
