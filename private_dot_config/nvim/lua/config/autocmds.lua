@@ -32,6 +32,18 @@ augroup END
 --   end,
 -- })
 
+-- chezmoi modify_ scripts carry the target file's extension, so classify them by shebang
+vim.filetype.add({
+  pattern = {
+    [".*/chezmoi/.*/modify_[^/]*"] = {
+      function(_, bufnr)
+        return vim.filetype.match({ contents = vim.api.nvim_buf_get_lines(bufnr, 0, 10, false) })
+      end,
+      { priority = 100 },
+    },
+  },
+})
+
 -- Disable diagnostics for markdown and text files
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "markdown", "text", "plaintext" },
