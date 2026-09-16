@@ -20,6 +20,9 @@ direnv = "latest"
 # Containers only: hosts log in through the distro's own fish, and a second
 # copy would win the PATH race against the shell systemd re-execs.
 "github:fish-shell/fish-shell" = "latest"
+# Devpods join the workstation client as saved Herdr machines, which means the
+# container runs its own Herdr server and agent integrations.
+herdr = "latest"
 {{- end}}
 node = "latest"
 bun = "latest"
