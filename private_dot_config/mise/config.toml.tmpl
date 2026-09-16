@@ -55,7 +55,6 @@ jq = "latest"
 {{- if (and (eq .chezmoi.hostname "px13") (not (stat "/.dockerenv")) (not (stat "/run/.containerenv")))}}
 herdr = "latest"
 rust = "stable"
-"cargo:https://github.com/argosnothing/niri-scratchpad-rs" = "rev:59069a5daef485b9e28929ff073567c78e0a4a5b"
 {{- end}}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "metagrowth")}}
 # only for the metagrowth devpod: the mirror publisher filters history with it
