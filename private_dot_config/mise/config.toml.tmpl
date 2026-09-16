@@ -22,7 +22,7 @@ direnv = "latest"
 "github:fish-shell/fish-shell" = "latest"
 # Devpods join the workstation client as saved Herdr machines, which means the
 # container runs its own Herdr server and agent integrations.
-herdr = "0.9.1"
+herdr = "latest"
 {{- end}}
 node = "latest"
 bun = "latest"
@@ -56,7 +56,7 @@ jq = "latest"
 "aqua:typst/typst" = "latest"
 {{- end }}
 {{- if (and (eq .chezmoi.hostname "px13") (not (stat "/.dockerenv")) (not (stat "/run/.containerenv")))}}
-herdr = "0.9.1"
+herdr = "latest"
 rust = "stable"
 {{- end}}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "metagrowth")}}
