@@ -7,7 +7,8 @@
 local osc52 = require("vim.ui.clipboard.osc52")
 local function paste()
   if vim.env.WAYLAND_DISPLAY and vim.fn.executable("wl-paste") == 1 then
-    return vim.fn.systemlist({ "wl-paste", "--no-newline" })
+    -- keepempty keeps the trailing empty line, so a linewise yank still pastes linewise
+    return vim.fn.systemlist({ "wl-paste", "--no-newline" }, "", 1)
   end
   return { vim.fn.getreg('"', 1, true), vim.fn.getregtype('"') }
 end
