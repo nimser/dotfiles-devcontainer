@@ -170,8 +170,35 @@ else
 fi
 "$CHEZMOI_BIN" --version >/dev/null 2>&1 || fail "chezmoi is unusable after bootstrap"
 
-# Deploy configuration and the mise external first. Built-in exclusions keep
-# bootstrap free of restore/activation hooks until their prerequisites exist.
+# Select declared versions, including table-form pins, for bootstrap tools.
+bootstrap_tool_names() {
+  sed -n '/^[[:space:]]*#/d; s/^"\{0,1\}\([^"= ]*\)"\{0,1\} *=.*/\1/p' \
+    "$HOME/.config/mise/config.toml" \
+    | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)$'
+}
+
+bootstrap_tool_specs() {
+  sed -n -e '/^[[:space:]]*#/d' \
+    -e 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *= *"\([^"]*\)".*/\1@\2/p' \
+    -e 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *= *{\(.*,\)\{0,1\} *version *= *"\([^"]*\)".*/\1@\3/p' \
+    "$HOME/.config/mise/config.toml" \
+    | grep -E "${1:-(^|/)(age|gopass|age-plugin-[a-z0-9-]+)@}"
+}
+
+# Render mise's declaration before any public modifier runs a mise-managed interpreter.
+mkdir -p "$HOME/.config/mise" || fail "Cannot create mise configuration directory"
+run_logged mise-config "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply --exclude=encrypted,scripts \
+  "$HOME/.config/mise/config.toml" || fail "Mise configuration failed to deploy"
+install_mise_nushell() (
+  set -euo pipefail
+  cd "$HOME" || exit 1
+  mapfile -t specs < <(bootstrap_tool_specs '^aqua:nushell/nushell@')
+  [ "${#specs[@]}" -eq 1 ] || { echo "Expected one Nushell version in mise config" >&2; exit 1; }
+  mise trust "$HOME/.config/mise/config.toml" && mise install "${specs[0]}" && nu --version
+)
+run_logged mise-nushell install_mise_nushell || fail "Nushell bootstrap failed"
+
+# Deploy public dotfiles before installing the rest of the toolchain.
 run_logged public-apply "$CHEZMOI_BIN" --source "$SCRIPT_DIR" apply --exclude=encrypted,scripts \
   || fail "Public dotfiles failed"
 
@@ -255,25 +282,6 @@ check_native_dependencies() {
   return 1
 }
 check_native_dependencies || fail "Native dependencies are missing"
-
-# Tools that open the encrypted dotfiles, taken from the deployed configuration
-# so this never becomes a second hand-maintained list. Backend-qualified keys
-# such as github:Foxboron/age-plugin-tpm are matched on their trailing name.
-bootstrap_tool_names() {
-  sed -n '/^[[:space:]]*#/d; s/^"\{0,1\}\([^"= ]*\)"\{0,1\} *=.*/\1/p' \
-    "$HOME/.config/mise/config.toml" \
-    | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)$'
-}
-
-# Both the bare `tool = "version"` form and the table form that carries install
-# options, so a tool gaining an option keeps its version instead of losing it.
-bootstrap_tool_specs() {
-  sed -n -e '/^[[:space:]]*#/d' \
-    -e 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *= *"\([^"]*\)".*/\1@\2/p' \
-    -e 's/^"\{0,1\}\([^"= ]*\)"\{0,1\} *= *{\(.*,\)\{0,1\} *version *= *"\([^"]*\)".*/\1@\3/p' \
-    "$HOME/.config/mise/config.toml" \
-    | grep -E '(^|/)(age|gopass|age-plugin-[a-z0-9-]+)@'
-}
 
 # The decryption toolchain comes from public releases and needs no credential,
 # so it can be installed before any secret exists. The rest of the toolchain
