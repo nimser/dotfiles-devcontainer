@@ -48,6 +48,7 @@ opt.foldenable = false  -- folds are expanded when file opens
 opt.listchars = { tab = " ", trail = "·" }
 opt.scrolloff = 6        -- Lines of context
 opt.signcolumn = "yes:1" -- always show signcolumns
+opt.spell = false
 opt.title = true         -- Allows neovim to send the Terminal details of the current window, instead of just getting 'v'
 opt.whichwrap = "[,]"
 opt.wrap = true
