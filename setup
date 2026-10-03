@@ -38,21 +38,14 @@ run_logged() {
   fi
 }
 
-# Run nix-env but keep the console output compact.
-# - Raw nix fetch/build logs are swallowed (kept in a logfile for diagnostics).
-# - On a TTY: a single status line is refreshed with the current package.
-# - Otherwise (e.g. `devpod up` logs): one concise line per package.
-# - Always ends with a ✅/❌ summary.
+# Keep package progress compact and retain full diagnostics on failure.
 install_nix_packages() {
   local log sep sb="" rc fetched built
   log=$(mktemp "${TMPDIR:-/tmp}/nix-install.XXXXXX.log")
   if [ -t 1 ]; then sep='\r\033[K'; else sep='\n'; fi
   command -v stdbuf > /dev/null 2>&1 && sb="stdbuf -oL -eL"
 
-  # tarball-ttl: trust the cached nixpkgs channel tarball for a week instead of
-  # the 1h default, so a persistent ~/.cache spares the ~50s fetchTarball+eval
-  NIX_CONFIG="${NIX_CONFIG:+$NIX_CONFIG$'\n'}tarball-ttl = 604800" \
-  $sb nix-env -f "$HOME/.config/nixpkgs/install.nix" -iA myPackages 2>&1 \
+  $sb "$HOME/.local/bin/nix-packages" 2>&1 \
     | tee "$log" \
     | while IFS= read -r line; do
         case "$line" in
@@ -78,7 +71,7 @@ install_nix_packages() {
     printf "${sep}  \xe2\x9d\x8c Nix install failed (%s fetched, %s built before error)\n" "$fetched" "$built"
     grep -iE "error:|failed" "$log" | sed 's/^/       /' | tail -15
     echo "       Full log kept at: $log"
-    errors+=("nix-env install failed — see $log or run 'nix-env -f ~/.config/nixpkgs/install.nix -iA myPackages' manually")
+    errors+=("Nix package rebuild failed — see $log or run '~/.local/bin/nix-packages' manually")
   fi
   return "$rc"
 }
