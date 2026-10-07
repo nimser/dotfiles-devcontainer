@@ -98,7 +98,9 @@ repackages a checksum-pinned upstream `.deb`, and the managed `handy` launcher
 selects native Wayland under niri. `wtype` provides Direct typing. Home preferences
 are declared in [`.chezmoidata/handy.json`](.chezmoidata/handy.json); a private
 modifier merges them into Handy's settings store on PX13 without managing API
-keys. Provisioning, updates and acceptance are in the
+keys. Its model cache and manual-model directory use the isolated
+`/var/lib/models/gguf/handy` store; settings, history and recordings stay in the
+home directory. Provisioning, updates and acceptance are in the
 [PX13 runbook](_system/px13/docs/RUNBOOK.md#personal-desktop-controls--host-acceptance-pending).
 
 Setup checks the native libraries, executables and services that the deployed
