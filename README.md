@@ -95,8 +95,11 @@ bridge and workstation-only user units are ignored.
 
 Handy is distro-owned: [`_system/handy-bin/PKGBUILD`](_system/handy-bin/PKGBUILD)
 repackages a checksum-pinned upstream `.deb`, and the managed `handy` launcher
-selects native Wayland under niri. `wtype` provides Direct typing. Provisioning,
-updates and acceptance are in the [PX13 runbook](_system/px13/docs/RUNBOOK.md#personal-desktop-controls--host-acceptance-pending).
+selects native Wayland under niri. `wtype` provides Direct typing. Home preferences
+are declared in [`.chezmoidata/handy.json`](.chezmoidata/handy.json); a private
+modifier merges them into Handy's settings store on PX13 without managing API
+keys. Provisioning, updates and acceptance are in the
+[PX13 runbook](_system/px13/docs/RUNBOOK.md#personal-desktop-controls--host-acceptance-pending).
 
 Setup checks the native libraries, executables and services that the deployed
 mise configuration implies — libfido2, pcsclite with pcscd and the CCID reader
