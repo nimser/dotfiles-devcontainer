@@ -93,9 +93,14 @@ and every other machine gets the plain host set. Non-workstation hosts retain
 common CLI configuration and the maintenance timer; desktop, hardware, backup,
 bridge and workstation-only user units are ignored.
 
+Handy is distro-owned: [`_system/handy-bin/PKGBUILD`](_system/handy-bin/PKGBUILD)
+repackages a checksum-pinned upstream `.deb`, and the managed `handy` launcher
+selects native Wayland under niri. `wtype` provides Direct typing. Provisioning,
+updates and acceptance are in the [PX13 runbook](_system/px13/docs/RUNBOOK.md#personal-desktop-controls--host-acceptance-pending).
+
 Setup checks the native libraries, executables and services that the deployed
 mise configuration implies — libfido2, pcsclite with pcscd and the CCID reader
-driver, ykman, FUSE 2 for the Handy AppImage, and keyd where
+driver, ykman, and keyd where
 `_system/<hostname>/etc/keyd` exists. A missing package or a disabled
 `pcscd.socket` stops setup with the pacman or apt command to run; nothing is
 installed or enabled for you, so an unattended run can never answer a
@@ -129,9 +134,8 @@ reconciliation. A still-configured tool will be reinstalled by maintenance.
 Run the same command after adding, replacing, renaming or deleting a manually
 managed AppImage to refresh its icon and launcher immediately; weekly
 maintenance also reconciles this directory.
-Only assets recorded in the integration manifest are removed; unrelated icons
-and launchers are preserved. The original Handy-only generated assets are
-removed during migration. `XDG_DATA_HOME` overrides both the manual AppImage
+Removal is limited to manifest-owned assets and the reserved `chezmoi-mise-handy`
+desktop/assets paths; unrelated icons and launchers are preserved. `XDG_DATA_HOME` overrides both the manual AppImage
 source directory and the generated-assets directory.
 
 Rclone comes from Nix. Its credential wrapper calls
