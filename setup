@@ -239,10 +239,6 @@ check_native_dependencies() {
       hints+=('sudo systemctl enable --now pcscd.socket')
     fi
   fi
-  # Handy is an AppImage, which mounts itself through FUSE 2.
-  if mise_declares 'cjpais/Handy'; then
-    have_lib libfuse.so.2 || missing+=('fuse2|libfuse2t64')
-  fi
   # keyd is host-only, even when a container shares the host's name.
   if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] \
     && [ -d "$SCRIPT_DIR/_system/$HOSTNAME/etc/keyd" ]; then
