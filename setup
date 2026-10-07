@@ -69,7 +69,7 @@ install_nix_packages() {
     rm -f "$log"
   else
     printf "${sep}  \xe2\x9d\x8c Nix install failed (%s fetched, %s built before error)\n" "$fetched" "$built"
-    grep -iE "error:|failed" "$log" | sed 's/^/       /' | tail -15
+    tail -30 "$log" | sed 's/^/       /'
     echo "       Full log kept at: $log"
     errors+=("Nix package rebuild failed — see $log or run '~/.local/bin/nix-packages' manually")
   fi
