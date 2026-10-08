@@ -77,6 +77,17 @@ readiness without changing DevPod state. Docker must already work for the user.
 The retired `t163` provider is disabled, and existing providers/workspaces are
 preserved during migration.
 
+Pi sessions start without the built-in MCP extension on hosts and development
+containers. `pi -e builtin:mcp` enables it for one invocation;
+`pi --continue -e builtin:mcp` resumes a session with MCP. Chezmoi preserves
+other extension selections and MCP servers while declaring Excalidraw over
+stdio with `mcp-excalidraw-server@2.1.2`, pinned for verified tool discovery and
+headless rendering. Opt-in sessions expose its 26 tools directly. MCP-enabled
+sessions auto-start the local canvas on `http://127.0.0.1:3000`; Mermaid conversion
+and viewport control require an open canvas tab. Devpods sharing the host's
+`~/.pi` and host networking share this configuration and canvas. Export diagrams
+before stopping the canvas server: its scene is stored in memory.
+
 Tools track `latest`. A pinned version carries the reason on the line above it
 in `~/.config/mise/config.toml`, and an unexplained pin fails the source checks.
 
@@ -157,7 +168,7 @@ chezmoi apply --exclude=encrypted,scripts
 
 Focused source checks: `python3 _utils/test-bootstrap.py` (Python, chezmoi,
 Bash, and Fish required), `python3 _utils/test-appimage-desktop.py`,
-`python3 _utils/test-login-secrets.py`, and
+`python3 _utils/test-login-secrets.py`, `python3 _utils/test-pi-mcp.py`, and
 `python3 -m unittest discover -s _system/px13/tests`.
 `python3 _utils/test-devpod-bootstrap.py` and
 `python3 _utils/test-setup-lifecycle.py` also require DevPod, yq and jq. They use
