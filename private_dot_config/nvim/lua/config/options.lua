@@ -1,14 +1,21 @@
 -- Options are automatically loaded before lazy.nvim startup
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
--- OSC 52 copy works everywhere, but tmux and herdr never answer the OSC 52 read
--- query, which froze every paste for 10s. wl-paste bypasses the terminal entirely;
--- sessions without a Wayland socket fall back to the last yank and paste externals
--- with Ctrl+Shift+V.
+-- OSC 52 writes through terminals; wl-paste reads through Wayland or the host clipboard bridge.
 local osc52 = require("vim.ui.clipboard.osc52")
+local clipboard_failed = false
 local function paste()
-  if vim.env.WAYLAND_DISPLAY and vim.fn.executable("wl-paste") == 1 then
-    -- keepempty keeps the trailing empty line, so a linewise yank still pastes linewise
-    return vim.fn.systemlist({ "wl-paste", "--no-newline" }, "", 1)
+  if (vim.env.CLIPBOARD_BRIDGE_SOCKET or vim.env.WAYLAND_DISPLAY) and vim.fn.executable("wl-paste") == 1 then
+    local lines = vim.fn.systemlist({ "wl-paste", "--no-newline" }, "", 1)
+    if vim.v.shell_error == 0 then
+      clipboard_failed = false
+      return lines
+    end
+    if not clipboard_failed then
+      clipboard_failed = true
+      vim.schedule(function()
+        vim.notify("Clipboard unavailable; using the last yank. Ctrl+Shift+V pastes through the terminal.", vim.log.levels.WARN)
+      end)
+    end
   end
   return { vim.fn.getreg('"', 1, true), vim.fn.getregtype('"') }
 end
