@@ -160,6 +160,32 @@ directory, publishing the store only after a successful transfer and Git check.
 Neovim plugin sync remains asynchronous; its log is
 `~/.local/state/nvim/lazy-sync.log`.
 
+### Python notebooks in Code - OSS
+
+On workstations with `code` installed, the notebook apply hook runs
+`notebook-setup`: mise's `uv` creates a managed Python 3.13 environment in
+`${XDG_DATA_HOME:-~/.local/share}/venvs/notebooks`, installs `ipykernel` and
+`pip`, registers **Python (notebooks)**, and installs the Python/Jupyter editor
+extensions. Rerun `notebook-setup` to repair the kernel or missing extensions;
+system Python and project environments are not modified.
+
+Code - OSS uses `~/.config/Code - OSS/User/settings.json`, not the Microsoft
+build's `~/.config/Code/User/settings.json`. Managed modifiers preserve unrelated
+settings and runtime arguments, enable proposed APIs only for the Python/Jupyter
+extensions, associate `.ipynb` files with the notebook editor, and select
+JavaScript environment discovery because Open VSX's universal Python package
+omits the native locator. Restart Code - OSS after applying runtime arguments;
+then open an `.ipynb` and choose **Select Kernel → Jupyter Kernel… →
+Python (notebooks)**. Once used, the kernel also appears in the recent-kernel
+list. Project-specific kernels can still be selected separately.
+
+Acceptance: execute `print(2 + 2)` and `input("Name: ")` in notebook cells;
+expect `4` and an input prompt. Error-teaching cells and `input()` can stop
+**Run All** by design. Do not copy `.venv` directories between hosts and
+containers; recreate them with the target machine's Python.
+
+Source checks: `python3 _utils/test-vscode-notebooks.py`.
+
 For file deployment without secrets or run hooks:
 
 ```bash
