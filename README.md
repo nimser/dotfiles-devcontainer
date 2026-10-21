@@ -179,12 +179,24 @@ then open an `.ipynb` and choose **Select Kernel → Jupyter Kernel… →
 Python (notebooks)**. Once used, the kernel also appears in the recent-kernel
 list. Project-specific kernels can still be selected separately.
 
+IPython 9 kernels using the default profile load
+`~/.ipython/profile_default/ipython_kernel_config.py`. Its `readable-dark`
+theme keeps traceback colors and highlights failing expressions in bright cyan
+without a background; VS Code strips traceback backgrounds. Restart the kernel
+after applying this configuration and rerun cells to replace saved outputs.
+
 Acceptance: execute `print(2 + 2)` and `input("Name: ")` in notebook cells;
 expect `4` and an input prompt. Error-teaching cells and `input()` can stop
 **Run All** by design. Do not copy `.venv` directories between hosts and
 containers; recreate them with the target machine's Python.
 
-Source checks: `python3 _utils/test-vscode-notebooks.py`.
+Source checks: `python3 _utils/test-vscode-notebooks.py`. Traceback checks start
+isolated kernels without touching running notebook sessions and verify readable
+errors while preserving colors:
+
+```bash
+"${XDG_DATA_HOME:-$HOME/.local/share}/venvs/notebooks/bin/python" _utils/test-ipython-tracebacks.py
+```
 
 For file deployment without secrets or run hooks:
 
