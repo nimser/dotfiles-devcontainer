@@ -61,6 +61,8 @@ herdr = "latest"
 rust = "stable"
 # Device access comes from px13-config's udev rule; the feed lists only the newest release.
 "http:ledger-live" = { version = "latest", bin = "ledger-live.AppImage", url = "https://download.live.ledger.com/ledger-live-desktop-{{"{{"}} version {{"}}"}}-linux-x86_64.AppImage", version_list_url = "https://download.live.ledger.com/latest-linux.yml", version_regex = '(?m)^version: (\S+)', version_date_expr = '''map(filter(split(body, "\n"), { hasPrefix(#, "releaseDate:") }), { [versions[0], trim(split(#, " ")[1], "'")] })''' }
+# Releases also ship a Flatpak; the pattern selects the x86_64 AppImage.
+"github:OrcaSlicer/OrcaSlicer" = { version = "latest", asset_pattern = "OrcaSlicer_Linux_AppImage_Ubuntu2404_V*.AppImage", bin = "orca-slicer.AppImage" }
 {{- end}}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "metagrowth")}}
 # only for the metagrowth devpod: the mirror publisher filters history with it
