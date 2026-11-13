@@ -59,6 +59,8 @@ jq = "latest"
 {{- if (and (eq .chezmoi.hostname "px13") (not (stat "/.dockerenv")) (not (stat "/run/.containerenv")))}}
 herdr = "latest"
 rust = "stable"
+# Device access comes from px13-config's udev rule; the feed lists only the newest release.
+"http:ledger-live" = { version = "latest", bin = "ledger-live.AppImage", url = "https://download.live.ledger.com/ledger-live-desktop-{{"{{"}} version {{"}}"}}-linux-x86_64.AppImage", version_list_url = "https://download.live.ledger.com/latest-linux.yml", version_regex = '(?m)^version: (\S+)', version_date_expr = '''map(filter(split(body, "\n"), { hasPrefix(#, "releaseDate:") }), { [versions[0], trim(split(#, " ")[1], "'")] })''' }
 {{- end}}
 {{- if (eq (env "DEVPOD_WORKSPACE_ID") "metagrowth")}}
 # only for the metagrowth devpod: the mirror publisher filters history with it
